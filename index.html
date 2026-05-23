@@ -7,243 +7,76 @@
   <title>SafeTune</title>
   <style>
     :root {
-      --bg: #0a0a0a;
-      --surface: #161616;
-      --surface2: #1f1f1f;
-      --accent: #00e5ff;
-      --text: #ffffff;
-      --text-sec: #888888;
+      --bg: #0a0a0a; --surface: #161616; --surface2: #1f1f1f;
+      --accent: #00e5ff; --text: #ffffff; --text-sec: #888888;
     }
     body.sunset { --accent: #ff7b00; }
     body.matrix { --accent: #00ff41; }
     
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { 
-      background: var(--bg); 
-      color: var(--text); 
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
-      padding-bottom: 80px;
-    }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, sans-serif; padding-bottom: 80px; }
     
-    header {
-      padding: 15px 20px;
-      background: var(--surface);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
+    header { padding: 15px 20px; background: var(--surface); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
     .logo { font-size: 1.5rem; font-weight: bold; color: var(--accent); }
-    .menu-btn {
-      background: var(--surface2);
-      border: none;
-      color: var(--text);
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 1.2rem;
-      cursor: pointer;
-    }
+    .menu-btn { background: var(--surface2); border: none; color: var(--text); padding: 8px 12px; border-radius: 8px; font-size: 1.2rem; cursor: pointer; }
     
-    /* Menu */
-    .menu-overlay {      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.7);
-      z-index: 90;
-    }
+    .menu-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; }
     .menu-overlay.open { display: block; }
-    .menu-panel {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: var(--surface);
-      border-radius: 20px 20px 0 0;
-      padding: 20px;
-      z-index: 91;
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-    .menu-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
+    .menu-panel { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-radius: 20px 20px 0 0; padding: 20px; z-index: 101; max-height: 80vh; overflow-y: auto; animation: slideUp 0.3s; }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    
+    .menu-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .menu-title { font-size: 1.2rem; font-weight: bold; }
-    .close-menu {
-      background: none;
-      border: none;
-      color: var(--text-sec);
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
+    .close-menu { background: none; border: none; color: var(--text-sec); font-size: 1.5rem; cursor: pointer; }
+    
     .menu-section { margin-bottom: 20px; }
-    .menu-label {
-      font-size: 0.8rem;
-      color: var(--text-sec);
-      text-transform: uppercase;
-      margin-bottom: 10px;
-    }
+    .menu-label { font-size: 0.8rem; color: var(--text-sec); text-transform: uppercase; margin-bottom: 10px; }
     .theme-grid { display: flex; gap: 10px; }
-    .theme-btn {
-      flex: 1;
-      padding: 12px;
-      border-radius: 10px;
-      border: 2px solid transparent;
-      cursor: pointer;
-      font-weight: bold;
-      text-align: center;
-    }    .theme-btn.active { border-color: var(--text); }
+    .theme-btn { flex: 1; padding: 12px; border-radius: 10px; border: 2px solid transparent; cursor: pointer; font-weight: bold; text-align: center; }
+    .theme-btn.active { border-color: var(--text); }
     .theme-blue { background: #00e5ff; color: #000; }
     .theme-orange { background: #ff7b00; color: #000; }
     .theme-green { background: #00ff41; color: #000; }
     
     .genre-list { display: flex; flex-wrap: wrap; gap: 8px; }
-    .genre-chip {
-      background: var(--surface2);
-      padding: 8px 14px;
-      border-radius: 20px;
-      cursor: pointer;
-    }
+    .genre-chip { background: var(--surface2); padding: 8px 14px; border-radius: 20px; cursor: pointer; }
+    .genre-chip:active { opacity: 0.7; }
     
     main { padding: 20px; max-width: 800px; margin: 0 auto; }
     h1 { text-align: center; margin: 20px 0 5px; font-size: 2rem; }
     h1 span { color: var(--accent); }
     .sub { text-align: center; color: var(--text-sec); margin-bottom: 25px; }
+    .section-title { font-size: 1.1rem; font-weight: bold; margin: 20px 0 10px; color: var(--accent); }
+        .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
+    .search-box input { flex: 1; background: var(--surface2); border: 1px solid #333; padding: 12px; border-radius: 10px; color: #fff; font-size: 1rem; }
+    .search-box button { background: var(--accent); color: #000; border: none; padding: 0 20px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1.2rem; }
     
-    .section-title {
-      font-size: 1.1rem;
-      font-weight: bold;
-      margin: 20px 0 10px;
-      color: var(--accent);
-    }
-    
-    .search-box {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    .search-box input {
-      flex: 1;
-      background: var(--surface2);
-      border: 1px solid #333;
-      padding: 12px;
-      border-radius: 10px;
-      color: #fff;
-      font-size: 1rem;
-    }
-    .search-box button {
-      background: var(--accent);
-      color: #000;
-      border: none;
-      padding: 0 20px;
-      border-radius: 10px;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 1.2rem;
-    }
-        .track {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background: var(--surface);
-      padding: 10px;
-      border-radius: 10px;
-      margin-bottom: 8px;
-    }
-    .track img {
-      width: 50px;
-      height: 50px;
-      border-radius: 8px;
-      object-fit: cover;
-    }
+    .track { display: flex; align-items: center; gap: 12px; background: var(--surface); padding: 10px; border-radius: 10px; margin-bottom: 8px; position: relative; z-index: 1; }
+    .track img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; }
     .info { flex: 1; min-width: 0; }
-    .name {
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .artist {
-      color: var(--text-sec);
-      font-size: 0.85rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+    .name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .artist { color: var(--text-sec); font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .actions { display: flex; gap: 8px; align-items: center; }
-    .duration {
-      color: var(--text-sec);
-      font-size: 0.75rem;
-      margin-right: 6px;
-      font-family: monospace;
-    }
+    .duration { color: var(--text-sec); font-size: 0.75rem; margin-right: 6px; font-family: monospace; }
     
-    .btn-icon {
-      background: var(--surface2);
-      border: none;
-      color: var(--text);
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 1rem;
-    }    .btn-play {
-      background: var(--accent);
-      color: #000;
-    }
-    .btn-play.playing {
-      background: var(--text-sec);
-      color: var(--accent);
-      border: 2px solid var(--accent);
-    }
+    .btn-icon { background: var(--surface2); border: none; color: var(--text); width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1rem; }
+    .btn-play { background: var(--accent); color: #000; }
+    .btn-play.playing { background: var(--text-sec); color: var(--accent); border: 2px solid var(--accent); }
     .btn-fav.active { color: #ff4545; }
     
-    /* Player Bar */
-    .player-bar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: #181818;
-      border-top: 1px solid #333;
-      padding: 10px 15px;
-      display: none;
-      align-items: center;
-      gap: 12px;
-      z-index: 50;
-      cursor: pointer;
-    }
+    .player-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #181818; border-top: 1px solid #333; padding: 10px 15px; display: none; align-items: center; gap: 12px; z-index: 50; cursor: pointer; }
     .player-bar.active { display: flex; }
     .p-img { width: 45px; height: 45px; border-radius: 6px; }
     .p-info { flex: 1; }
     .p-name { font-size: 0.9rem; font-weight: bold; }
     .p-art { font-size: 0.75rem; color: var(--text-sec); }
     .p-controls { display: flex; gap: 15px; }
-    .p-btn {
-      background: none;
-      border: none;
-      color: #fff;
-      cursor: pointer;
-      padding: 5px;
-    }
-    .p-btn-play {
-      background: var(--accent);
-      color: #000;
-      border-radius: 50%;
-      width: 36px;
-      height: 36px;
-    }
+    .p-btn { background: none; border: none; color: #fff; cursor: pointer; padding: 5px; }
+    .p-btn-play { background: var(--accent); color: #000; border-radius: 50%; width: 36px; height: 36px; }
     
-    .loading { text-align: center; padding: 40px; color: var(--text-sec); }
-    .empty { text-align: center; padding: 40px; color: var(--text-sec); }
-  </style></head>
+    .loading, .empty { text-align: center; padding: 40px; color: var(--text-sec); }
+  </style>
+</head>
 <body>
 
 <header>
@@ -251,8 +84,7 @@
   <button class="menu-btn" onclick="toggleMenu()">☰</button>
 </header>
 
-<!-- Menu -->
-<div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+<div class="menu-overlay" id="menuOverlay"></div>
 <div class="menu-panel" id="menuPanel">
   <div class="menu-header">
     <div class="menu-title">⚙️ Меню</div>
@@ -264,23 +96,22 @@
     <div class="theme-grid">
       <div class="theme-btn theme-blue active" onclick="setTheme('')">Синяя</div>
       <div class="theme-btn theme-orange" onclick="setTheme('sunset')">Оранжевая</div>
-      <div class="theme-btn theme-green" onclick="setTheme('matrix')">Матрица</div>
-    </div>
+      <div class="theme-btn theme-green" onclick="setTheme('matrix')">Матрица</div>    </div>
   </div>
   
   <div class="menu-section">
     <div class="menu-label">🎵 Жанры</div>
     <div class="genre-list">
-      <div class="genre-chip" onclick="loadGenre('Rock')">🎸 Рок</div>
-      <div class="genre-chip" onclick="loadGenre('Pop')">🎤 Поп</div>
-      <div class="genre-chip" onclick="loadGenre('Electronic')">🎛️ Электро</div>
-      <div class="genre-chip" onclick="loadGenre('Lo-Fi')">☕ Ло-фай</div>
+      <div class="genre-chip" onclick="loadGenre('Rock'); toggleMenu();">🎸 Рок</div>
+      <div class="genre-chip" onclick="loadGenre('Pop'); toggleMenu();">🎤 Поп</div>
+      <div class="genre-chip" onclick="loadGenre('Electronic'); toggleMenu();">🎛️ Электро</div>
+      <div class="genre-chip" onclick="loadGenre('Lo-Fi'); toggleMenu();">☕ Ло-фай</div>
     </div>
   </div>
   
   <div class="menu-section">
     <div class="menu-label">❤️ Избранное</div>
-    <div class="genre-chip" onclick="showFavorites()" style="text-align:center; padding:10px;">Открыть избранное</div>
+    <div class="genre-chip" onclick="showFavorites(); toggleMenu();" style="text-align:center; padding:10px;">Открыть избранное</div>
   </div>
 </div>
 
@@ -292,19 +123,19 @@
   <div id="list"><div class="loading">Загрузка...</div></div>
   
   <div class="section-title" style="margin-top:30px;">🔍 Поиск</div>
-  <div class="search-box">    <input type="text" id="search" placeholder="Название, автор...">
+  <div class="search-box">
+    <input type="text" id="search" placeholder="Название, автор...">
     <button onclick="doSearch()">🔍</button>
   </div>
 </main>
 
-<!-- Mini Player -->
-<div class="player-bar" id="playerBar" onclick="document.getElementById('fullPlayer').style.display='flex'">
+<div class="player-bar" id="playerBar">
   <img id="pImg" class="p-img" src="">
   <div class="p-info">
     <div id="pName">—</div>
     <div id="pArtist" style="font-size:0.75rem; color:var(--text-sec)">—</div>
   </div>
-  <div class="p-controls" onclick="event.stopPropagation()">
+  <div class="p-controls">
     <button class="p-btn p-btn-play" id="pBtn" onclick="togglePlay()">▶</button>
     <button class="p-btn" onclick="next()">⏭</button>
   </div>
@@ -314,21 +145,21 @@
 
 <script>
 const API = '64794605';
-let tracks = [], idx = -1, playing = false, activeId = null;
-let favs = JSON.parse(localStorage.getItem('favs')||'[]');
+let tracks = [], idx = -1, playing = false, activeId = null;let favs = JSON.parse(localStorage.getItem('favs')||'[]');
 
 window.onload = () => {
   const t = localStorage.getItem('theme')||'';
-  document.body.className = t;
+  setTheme(t, false);
   loadPopular();
   
-  // Event delegation for buttons
   document.getElementById('list').addEventListener('click', function(e) {
     const fav = e.target.closest('.btn-fav');
     const play = e.target.closest('.btn-play');
-    if(fav) toggleFav(parseInt(fav.dataset.id), fav);
-    if(play) playTrack(parseInt(play.dataset.id));
+    if(fav) { toggleFav(parseInt(fav.dataset.id), fav); e.stopPropagation(); }
+    if(play) { playTrack(parseInt(play.dataset.id)); e.stopPropagation(); }
   });
+  
+  document.getElementById('menuOverlay').addEventListener('click', toggleMenu);
 };
 
 function toggleMenu() {
@@ -336,12 +167,13 @@ function toggleMenu() {
   document.getElementById('menuPanel').classList.toggle('open');
 }
 
-function setTheme(t) {
+function setTheme(t, save=true) {
   document.body.className = t;
-  localStorage.setItem('theme', t);
+  if(save) localStorage.setItem('theme', t);
   document.querySelectorAll('.theme-btn').forEach(b=>b.classList.remove('active'));
   if(t==='sunset') document.querySelector('.theme-orange').classList.add('active');
-  else if(t==='matrix') document.querySelector('.theme-green').classList.add('active');  else document.querySelector('.theme-blue').classList.add('active');
+  else if(t==='matrix') document.querySelector('.theme-green').classList.add('active');
+  else document.querySelector('.theme-blue').classList.add('active');
 }
 
 async function loadPopular() {
@@ -357,26 +189,23 @@ async function loadPopular() {
 }
 
 window.loadGenre = function(g) {
-  toggleMenu();
   document.getElementById('list').innerHTML = '<div class="loading">Загрузка...</div>';
-  fetch(`https://api.jamendo.com/v3.0/tracks/?client_id=${API}&format=json&limit=20&search=${g}&order=popularity_total`)
+  fetch(`https://api.jamendo.com/v3.0/tracks/?client_id=${API}&format=json&limit=20&search=${encodeURIComponent(g)}&order=popularity_total`)
     .then(r=>r.json())
     .then(d=>{ tracks=d.results||[]; render(tracks); })
     .catch(()=>document.getElementById('list').innerHTML='<div class="empty">Ошибка</div>');
 };
-
 window.doSearch = function() {
   const q = document.getElementById('search').value.trim();
   if(!q) return;
   document.getElementById('list').innerHTML = '<div class="loading">Поиск...</div>';
-  fetch(`https://api.jamendo.com/v3.0/tracks/?client_id=${API}&format=json&limit=20&search=${q}&order=popularity_total`)
+  fetch(`https://api.jamendo.com/v3.0/tracks/?client_id=${API}&format=json&limit=20&search=${encodeURIComponent(q)}&order=popularity_total`)
     .then(r=>r.json())
     .then(d=>{ tracks=d.results||[]; render(tracks); })
     .catch(()=>document.getElementById('list').innerHTML='<div class="empty">Ошибка</div>');
 };
 
 window.showFavorites = function() {
-  toggleMenu();
   render(favs);
 };
 
@@ -390,7 +219,8 @@ function render(list) {
     return `<div class="track">
       <img src="${t.image}">
       <div class="info">
-        <div class="name">${t.name}</div>        <div class="artist">${t.artist_name}</div>
+        <div class="name">${t.name}</div>
+        <div class="artist">${t.artist_name}</div>
       </div>
       <div class="actions">
         <button class="btn-icon btn-fav ${isFav?'active':''}" data-id="${t.id}">♥</button>
@@ -406,20 +236,14 @@ window.toggleFav = function(id, btn) {
   const t = tracks.find(x=>x.id===id) || favs.find(x=>x.id===id);
   if(!t) return;
   const i = favs.findIndex(x=>x.id===id);
-  if(i>=0) {
-    favs.splice(i,1);
-    if(btn) btn.classList.remove('active');
-  } else {
-    favs.push(t);
-    if(btn) btn.classList.add('active');
-  }
+  if(i>=0) { favs.splice(i,1); if(btn) btn.classList.remove('active'); }
+  else { favs.push(t); if(btn) btn.classList.add('active'); }
   localStorage.setItem('favs', JSON.stringify(favs));
 };
 
 window.playTrack = function(id) {
   const t = tracks.find(x=>x.id===id) || favs.find(x=>x.id===id);
-  if(!t) return;
-  if(!tracks.includes(t)) tracks.push(t);
+  if(!t) return;  if(!tracks.includes(t)) tracks.push(t);
   idx = tracks.indexOf(t);
   activeId = id;
   
@@ -439,12 +263,8 @@ window.playTrack = function(id) {
 function updateButtons() {
   document.querySelectorAll('.btn-play').forEach(btn=>{
     const id = parseInt(btn.dataset.id);
-    if(id===activeId && playing) {      btn.innerHTML = '⏸';
-      btn.classList.add('playing');
-    } else {
-      btn.innerHTML = '▶';
-      btn.classList.remove('playing');
-    }
+    if(id===activeId && playing) { btn.innerHTML = '⏸'; btn.classList.add('playing'); }
+    else { btn.innerHTML = '▶'; btn.classList.remove('playing'); }
   });
   document.getElementById('pBtn').textContent = playing ? '⏸' : '▶';
 }
