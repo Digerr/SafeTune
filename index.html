@@ -283,7 +283,6 @@
 <script>
   const API_KEY = '64794605';
   
-  // Твоя единая база треков для корректного переключения Next/Prev
   let tracks = []; 
   let currentIdx = -1;
   let isPlaying = false;
@@ -292,7 +291,8 @@
 
   window.onload = () => {
     document.body.className = localStorage.getItem('theme') || '';
-    fetchTracks(`https://api.jamendo.com/v3.0/tracks/?client_id=${API_KEY}&format=json&limit=20&order=popularity_total`);
+    // Поправлен эндпоинт (убран лишний слеш перед знаками вопроса)
+    fetchTracks(`https://api.jamendo.com/v3.0/tracks?client_id=${API_KEY}&format=json&limit=20&order=popularity_total`);
     
     window.addEventListener('click', () => document.getElementById('themeMenu').classList.remove('open'));
   };
@@ -307,30 +307,34 @@
     localStorage.setItem('theme', t);
   }
 
-  // Поиск по жанру
   async function searchGenre(genre, tabEl) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     tabEl.classList.add('active');
     
-    const url = `https://api.jamendo.com/v3.0/tracks/?client_id=${API_KEY}&format=json&limit=20&order=popularity_total` + (genre ? `&fuzzytags=${genre}` : '');
+    const url = `https://api.jamendo.com/v3.0/tracks?client_id=${API_KEY}&format=json&limit=20&order=popularity_total` + (genre ? `&fuzzytags=${genre}` : '');
     fetchTracks(url);
   }
 
-  // Текстовый поиск
   async function doSearch() {
     const q = document.getElementById('searchInput').value.trim();
     if(!q) return;
-    const url = `https://api.jamendo.com/v3.0/tracks/?client_id=${API_KEY}&format=json&limit=20&search=${q}&order=popularity_total`;
+    const url = `https://api.jamendo.com/v3.0/tracks?client_id=${API_KEY}&format=json&limit=20&search=${q}&order=popularity_total`;
     fetchTracks(url);
   }
 
-  // Общий рендерер списков (Твоя логика)
   async function fetchTracks(url) {
     const el = document.getElementById('search-results');
     el.innerHTML = '<div class="loading">Ищем классные треки...</div>';
     try {
       const res = await fetch(url);
       const data = await res.json();
+      
+      // Если API вернул ошибку в самом JSON
+      if (data.headers && data.headers.status === "failed") {
+        el.innerHTML = `<div class="loading">Ошибка API: ${data.headers.error_message} 😔</div>`;
+        return;
+      }
+
       tracks = data.results || [];
       
       if(tracks.length === 0) {
@@ -341,7 +345,8 @@
       el.innerHTML = tracks.map((t) => renderTrack(t)).join('');
       updatePlayButtons(); 
     } catch(e) {
-      el.innerHTML = '<div class="loading">Ошибка сети при загрузке</div>';
+      // Выводим текст ошибки, чтобы сразу понять в чем затык
+      el.innerHTML = `<div class="loading">Ошибка сети при загрузке:<br><small style="color:#ff4d6d">${e.message}</small></div>`;
     }
   }
 
@@ -371,23 +376,24 @@
   }
 
   function toggleFav(id, btn) {
-    if(favorites.includes(id)) {
-      favorites = favorites.filter(x => x !== id);
+    const stringId = String(id);
+    if(favorites.includes(stringId)) {
+      favorites = favorites.filter(x => x !== stringId);
       btn.classList.remove('active');
     } else {
-      favorites.push(id);
+      favorites.push(stringId);
       btn.classList.add('active');
     }
     localStorage.setItem('favs', JSON.stringify(favorites));
   }
 
-  // --- ЛОГИКА ПЛЕЕРА ---
   window.playTrackById = function(id) {
-    let track = tracks.find(t => t.id === id);
+    const stringId = String(id);
+    let track = tracks.find(t => String(t.id) === stringId);
     if(!track) return;
     
     currentIdx = tracks.indexOf(track);
-    activeTrackId = id;
+    activeTrackId = stringId;
     
     const audio = document.getElementById('audio');
     audio.src = track.audio;
@@ -404,11 +410,4 @@
     document.getElementById('miniImg').src = t.image;
     
     document.getElementById('fullName').textContent = t.name;
-    document.getElementById('fullArt').textContent = t.artist_name;
-    document.getElementById('fullImg').src = t.image;
-    
-    document.getElementById('miniPlayer').classList.add('active');
-    
-    document.querySelectorAll('.track').forEach(el => el.classList.remove('active'));
-    const currentTrackEl = document.getElementById(`track-${t.id}`);
-    if(currentTrackEl) currentTrackEl.classList.
+    document.getElementById('fullArt').textContent = t.art
