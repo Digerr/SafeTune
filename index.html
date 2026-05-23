@@ -2,127 +2,200 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#0a0a0a">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0d0d0d">
+  <meta name="description" content="SafeTune — бесплатная музыка для стримов и видео">
   <title>SafeTune</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300e5ff'><path d='M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
+    /* ── ПЕРЕМЕННЫЕ И ТЕМЫ ─────────────────────────── */
     :root {
-      --bg: #0a0a0a; --surface: #161616; --surface2: #1f1f1f;
-      --accent: #00e5ff; --text: #ffffff; --text-sec: #888888;
-      --radius: 12px;
+      --bg:       #0d0d0d;
+      --surface:  #161616;
+      --surface2: #1e1e1e;
+      --surface3: #272727;
+      --accent:   #00e5ff; /* Синяя по умолчанию */
+      --text:     #f0f0f0;
+      --text2:    #888;
+      --text3:    #555;
+      --r:        14px;
+      --r-sm:     8px;
+      --player-h: 76px;
     }
     body.sunset { --accent: #ff7b00; }
     body.matrix { --accent: #00ff41; }
-    
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, sans-serif; padding-bottom: 90px; }
 
-    header { padding: 20px; display: flex; justify-content: space-between; align-items: center; background: var(--surface); position: sticky; top: 0; z-index: 10; border-bottom: 1px solid #222; }
-    .logo { font-size: 1.4rem; font-weight: 800; color: var(--accent); letter-spacing: -1px; }
-    .theme-btn { background: var(--surface2); border: none; color: var(--text-sec); padding: 8px 12px; border-radius: 20px; font-size: 0.9rem; cursor: pointer; }
+    /* ── СБРОС СТИЛЕЙ ──────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      padding-bottom: calc(var(--player-h) + 30px);
+      min-height: 100dvh;
+      overflow-x: hidden;
+    }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+    input  { font-family: inherit; outline: none; }
+
+    /* ── ХЭДЕР ──────────────────────────────────────── */
+    header {
+      position: sticky; top: 0; z-index: 40;
+      height: 60px;
+      background: rgba(13,13,13,0.85);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      display: flex; align-items: center; justify-content: space-between; padding: 0 16px;
+    }
+    .logo {
+      font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; letter-spacing: -0.5px; color: var(--accent);
+    }
+    .theme-btn {
+      background: var(--surface2); padding: 8px 14px; border-radius: 30px; font-size: 13px; font-weight: 500; color: var(--text2); transition: background .15s;
+    }
+    .theme-btn:hover { background: var(--surface3); color: var(--text); }
     
-    .theme-menu { display: none; position: absolute; top: 60px; right: 20px; background: var(--surface2); border-radius: 10px; padding: 10px; border: 1px solid #333; z-index: 20; }
+    .theme-menu {
+      display: none; position: absolute; top: 54px; right: 16px; background: var(--surface2);
+      border-radius: var(--r-sm); padding: 6px; border: 1px solid rgba(255,255,255,0.08); z-index: 50;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
     .theme-menu.open { display: block; }
-    .theme-opt { padding: 10px 15px; cursor: pointer; border-radius: 5px; }
+    .theme-opt { padding: 10px 16px; cursor: pointer; border-radius: 6px; font-size: 13px; font-weight: 500; }
+    .theme-opt:hover { background: var(--surface3); color: var(--accent); }
 
-    main { padding: 20px; max-width: 800px; margin: 0 auto; }
-    h1 { text-align: center; margin-bottom: 5px; font-size: 2rem; }
-    h1 span { color: var(--accent); }
-    p.sub { text-align: center; color: var(--text-sec); margin-bottom: 25px; }
-
-    .section-title { font-size: 1.1rem; font-weight: bold; margin: 20px 0 10px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+    /* ── ОСНОВНОЙ КОНТЕНТ ──────────────────────────── */
+    main { max-width: 680px; margin: 0 auto; padding: 20px 14px 0; }
     
-    .tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; margin-bottom: 15px; }
+    .hero { text-align: center; padding: 20px 0 24px; }
+    .hero h1 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2.5rem; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 6px; }
+    .hero h1 span { color: var(--accent); }
+    .hero .sub { color: var(--text2); font-size: 14px; }
+
+    .section-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.05rem; margin: 24px 0 14px; display: flex; align-items: center; gap: 6px; }
+    
+    /* Скролл жанров */
+    .tabs { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 20px; margin: 0 -14px 20px; padding: 0 14px; scrollbar-width: none; }
     .tabs::-webkit-scrollbar { display: none; }
-    .tab { background: var(--surface2); padding: 8px 16px; border-radius: 20px; white-space: nowrap; color: var(--text-sec); cursor: pointer; font-size: 0.9rem; border: 1px solid transparent; }
-    .tab.active { background: var(--accent); color: #000; font-weight: bold; }
+    .tab { background: var(--surface); padding: 8px 16px; border-radius: 30px; white-space: nowrap; color: var(--text2); font-size: 13px; font-weight: 500; border: 1px solid rgba(255,255,255,0.05); transition: all .15s; }
+    .tab:hover { background: var(--surface2); }
+    .tab.active { background: var(--accent); color: #000; font-weight: 600; border-color: transparent; }
 
-    .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
-    .search-box input { flex: 1; background: var(--surface2); border: 1px solid #333; padding: 12px; border-radius: var(--radius); color: #fff; font-size: 1rem; outline: none; }
-    .search-box button { background: var(--accent); color: #000; border: none; padding: 0 20px; border-radius: var(--radius); font-weight: bold; cursor: pointer; font-size: 1.2rem; }
+    /* Поиск */
+    .search-box { display: flex; gap: 8px; margin-bottom: 20px; }
+    .search-box input { flex: 1; background: var(--surface); border: 1px solid rgba(255,255,255,0.07); padding: 13px 16px; border-radius: var(--r); color: #fff; font-size: 14px; transition: border-color .2s; }
+    .search-box input:focus { border-color: var(--accent); }
+    .search-box button { background: var(--surface2); color: var(--text); border: 1px solid rgba(255,255,255,0.05); padding: 0 18px; border-radius: var(--r); font-weight: bold; transition: background .15s; }
+    .search-box button:hover { background: var(--surface3); }
 
-    /* Track List */
-    .track { display: flex; align-items: center; gap: 12px; background: var(--surface); padding: 10px; border-radius: var(--radius); margin-bottom: 8px; }
-    .track img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; }
+    /* Списки треков */
+    .track-list { display: flex; flex-direction: column; gap: 6px; }
+    .track { display: flex; align-items: center; gap: 12px; background: var(--surface); padding: 10px 12px; border-radius: var(--r); border: 1px solid transparent; transition: background .15s; }
+    .track:hover { background: var(--surface2); }
+    .track.active { background: var(--surface2); border-color: rgba(0,229,255,0.15); }
+    .track.active .name { color: var(--accent); }
+
+    .track img { width: 48px; height: 48px; border-radius: var(--r-sm); object-fit: cover; flex-shrink: 0; background: var(--surface3); }
     .info { flex: 1; min-width: 0; }
-    .name { font-weight: 600; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }    .artist { color: var(--text-sec); font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    
-    .duration { color: var(--text-sec); font-size: 0.75rem; margin-right: 8px; font-family: monospace; }
-    
-    .actions { display: flex; gap: 8px; align-items: center; }
-    
-    /* Улучшенный дизайн кнопок */
-    .btn-icon { 
-      background: var(--surface2); border: none; color: var(--text); 
-      width: 38px; height: 38px; border-radius: 50%; 
-      display: flex; align-items: center; justify-content: center; 
-      cursor: pointer; font-size: 1rem; transition: all 0.2s; 
-    }
-    
-    /* Стильная кнопка Play */
-    .btn-play { 
-      background: var(--accent); color: #000; 
-      box-shadow: 0 0 10px var(--accent); /* Свечение */
-    }
-    .btn-play:active { transform: scale(0.9); }
-    .btn-play.playing { 
-      background: var(--text-sec); color: var(--accent); 
-      box-shadow: none; border: 2px solid var(--accent);
-    }
-    
-    .btn-fav.active { color: #ff4545; }
+    .name { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+    .artist { color: var(--text2); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .duration { color: var(--text3); font-size: 12px; font-variant-numeric: tabular-nums; margin-right: 4px; }
+    .actions { display: flex; gap: 6px; align-items: center; }
 
-    /* Mini Player Bar */
-    .player-bar { 
-      position: fixed; bottom: 0; left: 0; right: 0; 
-      background: #181818; border-top: 1px solid #333; 
-      padding: 10px 15px; display: none; align-items: center; gap: 12px; 
-      z-index: 50; cursor: pointer; box-shadow: 0 -5px 15px rgba(0,0,0,0.5); 
+    /* Кнопки действий */
+    .btn-icon { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: transparent; transition: background .15s; color: var(--text2); }
+    .btn-icon:hover { background: var(--surface3); color: var(--text); }
+    .btn-icon svg { width: 16px; height: 16px; fill: currentColor; }
+    
+    .btn-fav.active { color: #ff4d6d; }
+    .btn-play { background: var(--accent); color: #000; width: 36px; height: 36px; }
+    .btn-play:hover { filter: brightness(1.1); }
+    .btn-play svg { width: 14px; height: 14px; fill: currentColor; }
+    .btn-play.playing { background: var(--surface3); color: var(--accent); border: 1px solid rgba(255,255,255,0.1); }
+
+    /* Лоадер */
+    .loading { text-align: center; padding: 30px; color: var(--text3); font-size: 14px; }
+
+    /* ── МИНИ ПЛЕЕР ────────────────────────────────── */
+    .player-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; height: var(--player-h);
+      background: rgba(18,18,18,0.96); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255,255,255,0.06); padding: 0 16px;
+      display: none; align-items: center; gap: 12px; z-index: 50; cursor: pointer;
+      box-shadow: 0 -10px 30px rgba(0,0,0,0.3);
+      padding-bottom: env(safe-area-inset-bottom); /* Фикс для айфонов */
     }
     .player-bar.active { display: flex; }
-    .p-img { width: 45px; height: 45px; border-radius: 6px; flex-shrink: 0; }
+    .p-img { width: 46px; height: 46px; border-radius: var(--r-sm); object-fit: cover; flex-shrink: 0; }
     .p-info { flex: 1; min-width: 0; }
-    .p-name { font-size: 0.9rem; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .p-art { font-size: 0.75rem; color: var(--text-sec); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .p-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 1px; }
+    .p-art { font-size: 12px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .p-controls { display: flex; align-items: center; gap: 6px; }
     
-    .p-controls { display: flex; align-items: center; gap: 15px; }
-    .p-btn { background: none; border: none; color: #fff; cursor: pointer; padding: 5px; display: flex; align-items: center; justify-content: center; }
-    .p-btn-play { background: var(--accent); color: #000; border-radius: 50%; width: 36px; height: 36px; box-shadow: 0 0 8px var(--accent); }
+    .p-btn { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text); }
+    .p-btn:hover { background: rgba(255,255,255,0.05); }
+    .p-btn svg { width: 18px; height: 18px; fill: currentColor; }
+    .p-btn-play { background: var(--accent); color: #000; width: 40px; height: 40px; }
+    .p-btn-play:hover { background: var(--accent); filter: brightness(1.1); }
 
-    /* Full Modal Player */
-    .modal { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 100; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+    /* ── МОДАЛЬНЫЙ ПЛЕЕР ───────────────────────────── */
+    .modal {
+      position: fixed; inset: 0; background: var(--bg); z-index: 100;
+      display: none; flex-direction: column; align-items: center; padding: 20px 24px 40px;
+    }
     .modal.open { display: flex; }
-    .close-modal { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--text-sec); font-size: 2rem; cursor: pointer; z-index: 101; }
-    .m-cover { width: 85%; max-width: 320px; aspect-ratio: 1; border-radius: 20px; margin-bottom: 25px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); object-fit: cover; }
-    .m-title { font-size: 1.4rem; font-weight: bold; text-align: center; margin-bottom: 5px; }    .m-artist { color: var(--text-sec); margin-bottom: 30px; font-size: 1rem; }
+    .close-modal { align-self: flex-start; width: 40px; height: 40px; border-radius: 50%; background: var(--surface2); display: flex; align-items: center; justify-content: center; color: var(--text2); margin-bottom: 20px; }
+    .close-modal:hover { background: var(--surface3); color: var(--text); }
+    .close-modal svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; }
     
-    .eq-box { display: flex; gap: 4px; height: 20px; align-items: flex-end; margin-bottom: 25px; }
+    .m-cover { width: min(75vw, 300px); aspect-ratio: 1; border-radius: 18px; margin-bottom: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); object-fit: cover; }
+    
+    /* Живой Эквалайзер */
+    .eq-box { display: flex; gap: 4px; height: 20px; align-items: flex-end; margin-bottom: 20px; opacity: 0; transition: opacity 0.3s; }
+    .modal.playing .eq-box { opacity: 1; }
     .bar { width: 4px; background: var(--accent); height: 4px; border-radius: 2px; }
-    .playing .bar { animation: bounce 0.8s infinite ease-in-out alternate; }
+    .modal.playing .bar { animation: bounce 0.6s infinite ease-in-out alternate; }
     .bar:nth-child(1) { animation-delay: 0s; }
-    .bar:nth-child(2) { animation-delay: 0.2s; }
-    .bar:nth-child(3) { animation-delay: 0.4s; }
+    .bar:nth-child(2) { animation-delay: 0.15s; animation-duration: 0.4s; }
+    .bar:nth-child(3) { animation-delay: 0.3s; animation-duration: 0.8s; }
+    .bar:nth-child(4) { animation-delay: 0.45s; animation-duration: 0.5s; }
     @keyframes bounce { 0% { height: 4px; } 100% { height: 20px; } }
 
-    .modal-controls { display: flex; gap: 40px; align-items: center; margin-bottom: 30px; }
-    .modal-btn { background: none; border: none; color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .modal-btn-lg { width: 70px; height: 70px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px var(--accent); }
+    .m-title { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 700; text-align: center; margin-bottom: 4px; width: 100%; max-width: 340px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .m-artist { color: var(--text2); margin-bottom: 32px; font-size: 14px; }
+    
+    .modal-controls { display: flex; gap: 24px; align-items: center; margin-bottom: 32px; }
+    .modal-btn { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text); transition: background .15s; }
+    .modal-btn:hover { background: var(--surface2); }
+    .modal-btn svg { width: 20px; height: 20px; fill: currentColor; }
+    .modal-btn-lg { width: 64px; height: 64px; background: var(--accent); color: #000; }
+    .modal-btn-lg:hover { background: var(--accent); filter: brightness(1.1); }
+    .modal-btn-lg svg { width: 24px; height: 24px; }
 
-    .progress-bar { width: 100%; max-width: 350px; display: flex; align-items: center; gap: 12px; }
-    .time { font-size: 0.8rem; color: var(--text-sec); font-family: monospace; min-width: 40px; text-align: center; }
-    input[type=range] { flex: 1; height: 4px; -webkit-appearance: none; background: #333; border-radius: 2px; }
-    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; background: var(--accent); border-radius: 50%; cursor: pointer; }
-
-    .loading { text-align: center; padding: 40px; color: var(--text-sec); }
+    /* Кастомный прогресс-бар */
+    .progress-bar { width: 100%; max-width: 340px; display: flex; align-items: center; gap: 12px; }
+    .time { font-size: 12px; color: var(--text3); font-variant-numeric: tabular-nums; min-width: 36px; }
+    input[type=range] { flex: 1; height: 4px; -webkit-appearance: none; background: var(--surface3); border-radius: 2px; outline: none; }
+    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; background: var(--accent); border-radius: 50%; cursor: pointer; transition: transform 0.1s; }
+    input[type=range]:active::-webkit-slider-thumb { transform: scale(1.3); }
   </style>
 </head>
 <body>
 
+<svg style="display: none;">
+  <symbol id="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
+  <symbol id="icon-pause" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></symbol>
+  <symbol id="icon-next" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></symbol>
+  <symbol id="icon-prev" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></symbol>
+  <symbol id="icon-heart" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.5 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></symbol>
+  <symbol id="icon-download" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></symbol>
+</svg>
+
 <header>
-  <div class="logo">🎵 SafeTune</div>
-  <button class="theme-btn" onclick="toggleMenu()">🎨 Тема</button>
+  <div class="logo">SafeTune</div>
+  <button class="theme-btn" onclick="toggleMenu(event)">🎨 Тема</button>
   <div class="theme-menu" id="themeMenu">
     <div class="theme-opt" onclick="setTheme('')">🔵 Синяя</div>
     <div class="theme-opt" onclick="setTheme('sunset')">🟠 Оранжевая</div>
@@ -131,54 +204,72 @@
 </header>
 
 <main>
-  <h1>Safe<span>Tune</span></h1>
-  <p class="sub">Музыка для твоего контента</p>
+  <div class="hero">
+    <h1>Safe<span>Tune</span></h1>
+    <p class="sub">Бесплатная музыка без авторских прав</p>
+  </div>
 
-  <div class="section-title">🔥 Популярное сейчас</div>
-  <div id="popular-list"><div class="loading">Загрузка...</div></div>
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="Поиск треков или авторов...">
+    <button onclick="doSearch()">Поиск</button>
+  </div>
 
-  <div class="section-title">🎵 Жанры</div>
+  <div class="section-title">🔥 Популярные треки</div>
+  <div id="popular-list" class="track-list"><div class="loading">Загрузка треков...</div></div>
+
+  <div class="section-title">⚡ Жанры</div>
   <div class="tabs" id="tabs">
-    <div class="tab active" onclick="searchGenre('')">🔥 Все</div>
-    <div class="tab" onclick="searchGenre('Rock')">🎸 Рок</div>
-    <div class="tab" onclick="searchGenre('Pop')">🎤 Поп</div>
-    <div class="tab" onclick="searchGenre('Electronic')">🎛️ Электро</div>
+    <div class="tab active" onclick="searchGenre('', this)">🔥 Все</div>
+    <div class="tab" onclick="searchGenre('Rock', this)">🎸 Рок</div>
+    <div class="tab" onclick="searchGenre('Pop', this)">🎤 Поп</div>
+    <div class="tab" onclick="searchGenre('Electronic', this)">🎛️ Электро</div>
+    <div class="tab" onclick="searchGenre('HipHop', this)">🎧 Хип-хоп</div>
+    <div class="tab" onclick="searchGenre('Ambient', this)">🌌 Эмбиент</div>
   </div>
 
-  <div class="search-box">    <input type="text" id="searchInput" placeholder="Поиск...">
-    <button onclick="doSearch()">🔍</button>
-  </div>
-
-  <div id="search-results"></div>
+  <div id="search-results" class="track-list"></div>
 </main>
 
-<!-- Mini Player -->
 <div class="player-bar" id="miniPlayer" onclick="openFullPlayer()">
-  <img id="miniImg" class="p-img" src="">
+  <img id="miniImg" class="p-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
   <div class="p-info">
     <div class="p-name" id="miniName">—</div>
     <div class="p-art" id="miniArt">—</div>
   </div>
   <div class="p-controls" onclick="event.stopPropagation()">
-    <button class="p-btn p-btn-play" id="miniPlayBtn">▶</button>
-    <button class="p-btn" onclick="playNext()">⏭</button>
+    <button class="p-btn p-btn-play" id="miniPlayBtn" onclick="togglePlay()">
+      <svg><use href="#icon-play"></use></svg>
+    </button>
+    <button class="p-btn" onclick="playNext()">
+      <svg><use href="#icon-next"></use></svg>
+    </button>
   </div>
 </div>
 
-<!-- Full Modal -->
 <div class="modal" id="fullPlayer">
-  <button class="close-modal" onclick="closeFullPlayer()">✕</button>
-  <img id="fullImg" class="m-cover" src="">
+  <button class="close-modal" onclick="closeFullPlayer()">
+    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+  </button>
+  
+  <img id="fullImg" class="m-cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+  
   <div class="eq-box" id="eqBox">
-    <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+    <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
   </div>
+  
   <div class="m-title" id="fullName">—</div>
   <div class="m-artist" id="fullArt">—</div>
   
   <div class="modal-controls">
-    <button class="modal-btn" onclick="playPrev()">⏮</button>
-    <button class="modal-btn modal-btn-lg" onclick="togglePlay()" id="fullPlayBtn">▶</button>
-    <button class="modal-btn" onclick="playNext()">⏭</button>
+    <button class="modal-btn" onclick="playPrev()">
+      <svg><use href="#icon-prev"></use></svg>
+    </button>
+    <button class="modal-btn modal-btn-lg" onclick="togglePlay()" id="fullPlayBtn">
+      <svg><use href="#icon-play"></use></svg>
+    </button>
+    <button class="modal-btn" onclick="playNext()">
+      <svg><use href="#icon-next"></use></svg>
+    </button>
   </div>
 
   <div class="progress-bar">
@@ -192,184 +283,134 @@
 
 <script>
   const API_KEY = '64794605';
-  let tracks = [], currentIdx = -1, isPlaying = false;
+  
+  // Хранилища плейлистов, чтобы поиск не ломал логику Next/Prev
+  let currentPlaylist = []; 
+  let currentIdx = -1;
+  let isPlaying = false;
+  let activeTrackId = null;
   let favorites = JSON.parse(localStorage.getItem('favs') || '[]');
-  let activeTrackId = null; // Храним ID играющего трека, а не только индекс
+
   window.onload = () => {
-    const savedTheme = localStorage.getItem('theme') || '';
-    document.body.className = savedTheme;
+    document.body.className = localStorage.getItem('theme') || '';
     loadPopular();
+    
+    // Закрывать меню выбора темы при клике в любое другое место
+    window.addEventListener('click', () => document.getElementById('themeMenu').classList.remove('open'));
   };
 
-  function toggleMenu() { document.getElementById('themeMenu').classList.toggle('open'); }
-  function setTheme(t) { document.body.className = t; localStorage.setItem('theme', t); toggleMenu(); }
+  function toggleMenu(e) {
+    e.stopPropagation();
+    document.getElementById('themeMenu').classList.toggle('open');
+  }
 
+  function setTheme(t) {
+    document.body.className = t;
+    localStorage.setItem('theme', t);
+  }
+
+  // Загрузка топа
   async function loadPopular() {
-    await fetchTracks(`https://api.jamendo.com/v3.0/tracks/?client_id=${API_KEY}&format=json&limit=10&order=popularity_total`, 'popular-list');
+    currentPlaylist = await fetchTracks(`https://api.jamendo.com/v3.0/tracks/?client_id=${API_KEY}&format=json&limit=10&order=popularity_total`, 'popular-list', true);
   }
 
-  async function searchGenre(genre) {
+  // Поиск по жанру
+  async function searchGenre(genre, tabEl) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    event.target.classList.add('active');
-    await fetchTracks(`https://api.jamendo.com/v3.0/tracks/?client_id=${API_KEY}&format=json&limit=20&search=${genre}&order=popularity_total`, 'search-results');
+    tabEl.classList.add('active');
+    
+    const url = `https://api.jamendo.com/v3.0/tracks/?client_id=${API_KEY}&format=json&limit=20&order=popularity_total` + (genre ? `&fuzzytags=${genre}` : '');
+    currentPlaylist = await fetchTracks(url, 'search-results', false);
   }
 
+  // Обычный текстовый поиск
   async function doSearch() {
-    const q = document.getElementById('searchInput').value;
+    const q = document.getElementById('searchInput').value.trim();
     if(!q) return;
-    await fetchTracks(`https://api.jamendo.com/v3.0/tracks/?client_id=${API_KEY}&format=json&limit=20&search=${q}&order=popularity_total`, 'search-results');
+    const url = `https://api.jamendo.com/v3.0/tracks/?client_id=${API_KEY}&format=json&limit=20&search=${q}&order=popularity_total`;
+    currentPlaylist = await fetchTracks(url, 'search-results', false);
   }
 
-  async function fetchTracks(url, targetId) {
+  // Общий фетчер
+  async function fetchTracks(url, targetId, isInitPopular) {
     const el = document.getElementById(targetId);
-    el.innerHTML = '<div class="loading">Загрузка...</div>';
+    el.innerHTML = '<div class="loading">Ищем классные треки...</div>';
     try {
       const res = await fetch(url);
       const data = await res.json();
-      tracks = data.results || [];
-      el.innerHTML = tracks.map((t, i) => renderTrack(t, i)).join('');
-    } catch(e) { el.innerHTML = '<div class="loading">Ошибка</div>'; }
+      const fetchedTracks = data.results || [];
+      
+      if(fetchedTracks.length === 0) {
+        el.innerHTML = '<div class="loading">Ничего не найдено 😔</div>';
+        return [];
+      }
+      
+      el.innerHTML = fetchedTracks.map((t) => renderTrack(t)).join('');
+      updatePlayButtons(); // Синхронизируем иконки, если что-то уже играет
+      return fetchedTracks;
+    } catch(e) {
+      el.innerHTML = '<div class="loading">Ошибка сети при загрузке</div>';
+      return [];
+    }
   }
 
-  function renderTrack(t, i) {
+  function renderTrack(t) {
     const isFav = favorites.includes(t.id);
-    const duration = formatDuration(t.duration);
+    const duration = formatTime(t.duration);
     return `
-      <div class="track">
-        <img src="${t.image}">
-        <div class="info">
+      <div class="track" id="track-${t.id}">
+        <img src="${t.image}" alt="">
+        <div class="info" onclick="playTrackById('${t.id}')" style="cursor:pointer;">
           <div class="name">${t.name}</div>
           <div class="artist">${t.artist_name}</div>
         </div>
         <div class="actions">
-          <button class="btn-icon btn-fav ${isFav?'active':''}" onclick="toggleFav(${t.id}, this)">♥</button>
-          <button class="btn-icon btn-play" data-id="${t.id}" onclick="playTrackById(${t.id})">▶</button>          <div class="duration">${duration}</div>
-          <button class="btn-icon" onclick="download('${t.audiodownload}', '${t.name.replace(/'/g,"")}')">⬇</button>
+          <div class="duration">${duration}</div>
+          <button class="btn-icon btn-fav ${isFav?'active':''}" onclick="toggleFav('${t.id}', this)">
+            <svg><use href="#icon-heart"></use></svg>
+          </button>
+          <button class="btn-icon btn-play" data-id="${t.id}" onclick="playTrackById('${t.id}')">
+            <svg><use href="#icon-play"></use></svg>
+          </button>
+          <button class="btn-icon" onclick="download('${t.audiodownload}', '${t.name.replace(/'/g,"")}')">
+            <svg><use href="#icon-download"></use></svg>
+          </button>
         </div>
       </div>`;
   }
 
   function toggleFav(id, btn) {
-    if(favorites.includes(id)) { favorites = favorites.filter(x => x!==id); btn.classList.remove('active'); }
-    else { favorites.push(id); btn.classList.add('active'); }
+    if(favorites.includes(id)) {
+      favorites = favorites.filter(x => x !== id);
+      btn.classList.remove('active');
+    } else {
+      favorites.push(id);
+      btn.classList.add('active');
+    }
     localStorage.setItem('favs', JSON.stringify(favorites));
   }
 
-  // --- AUDIO LOGIC ---
+  // --- ЛОГИКА ПЛЕЕРА ---
   window.playTrackById = function(id) {
-    const track = tracks.find(t => t.id === id);
+    // Ищем трек в текущем активном плейлисте
+    let track = currentPlaylist.find(t => t.id === id);
+    
     if(track) {
-      currentIdx = tracks.indexOf(track);
-      activeTrackId = id;
-      
-      const audio = document.getElementById('audio');
-      audio.src = track.audio;
-      audio.play().catch(e => console.error("Play error:", e));
-      
-      isPlaying = true;
-      updateUI(track);
-      updatePlayButtons();
+      currentIdx = currentPlaylist.indexOf(track);
+    } else {
+      // Заглушка на случай, если трек из другого списка (например, кликнули по Популярным после поиска)
+      return; 
     }
-  };
 
-  function updateUI(t) {
-    document.getElementById('miniName').textContent = t.name;
-    document.getElementById('miniArt').textContent = t.artist_name;
-    document.getElementById('miniImg').src = t.image;
-    document.getElementById('fullName').textContent = t.name;
-    document.getElementById('fullArt').textContent = t.artist_name;
-    document.getElementById('fullImg').src = t.image;
-    document.getElementById('miniPlayer').classList.add('active');
-  }
-
-  function updatePlayButtons() {
-    const icon = isPlaying ? '⏸' : '▶';
-    document.getElementById('miniPlayBtn').textContent = icon;
-    document.getElementById('fullPlayBtn').textContent = icon;
-    
-    const modal = document.getElementById('fullPlayer');
-    if(isPlaying) modal.classList.add('playing');
-    else modal.classList.remove('playing');
-    
-    // Ищем кнопку с нужным ID и меняем её
-    document.querySelectorAll('.btn-play').forEach(btn => {      const btnId = btn.getAttribute('data-id');
-      if(btnId == activeTrackId) {
-        btn.innerHTML = icon;
-        if(isPlaying) btn.classList.add('playing');
-        else btn.classList.remove('playing');
-      } else {
-        btn.innerHTML = '▶';
-        btn.classList.remove('playing');
-      }
-    });
-  }
-
-  window.togglePlay = function() {
+    activeTrackId = id;
     const audio = document.getElementById('audio');
-    if(!audio.src) return;
-    if(audio.paused) { 
-      audio.play(); isPlaying = true; 
-    } else { 
-      audio.pause(); isPlaying = false; 
-    }
+    audio.src = track.audio;
+    audio.play().catch(e => console.log("Play interrupted"));
+    
+    isPlaying = true;
+    updateUI(track);
     updatePlayButtons();
   };
 
-  window.playNext = function() {
-    if(currentIdx < tracks.length - 1) {
-      playTrackById(tracks[currentIdx + 1].id);
-    }
-  };
-  
-  window.playPrev = function() {
-    if(currentIdx > 0) {
-      playTrackById(tracks[currentIdx - 1].id);
-    }
-  };
-
-  document.getElementById('audio').onended = window.playNext;
-  
-  const audio = document.getElementById('audio');
-  const seekBar = document.getElementById('seekBar');
-  
-  audio.ontimeupdate = () => {
-    if(audio.duration) {
-      seekBar.value = (audio.currentTime / audio.duration) * 100;
-      document.getElementById('curTime').textContent = formatTime(audio.currentTime);
-      document.getElementById('durTime').textContent = formatTime(audio.duration);
-    }
-  };
-  
-  seekBar.oninput = () => {
-    if(audio.duration) audio.currentTime = (seekBar.value / 100) * audio.duration;  };
-
-  function formatTime(s) {
-    const m = Math.floor(s/60);
-    const sec = Math.floor(s%60);
-    return m + ':' + (sec<10?'0':'') + sec;
-  }
-
-  function formatDuration(s) {
-    if(!s) return "0:00";
-    const m = Math.floor(s/60);
-    const sec = Math.floor(s%60);
-    return m + ':' + (sec<10?'0':'') + sec;
-  }
-
-  window.openFullPlayer = function() { document.getElementById('fullPlayer').classList.add('open'); };
-  window.closeFullPlayer = function() { document.getElementById('fullPlayer').classList.remove('open'); };
-
-  window.download = function(url, name) {
-    if(!url) return;
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = name + '.mp3';
-    a.target = '_blank';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  };
-</script>
-
-</body>
-</html>
+  function updateUI(t) {
+    document.getElementById('miniName').textContent = t.name
