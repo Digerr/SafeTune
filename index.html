@@ -2,287 +2,373 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#0a0a0a">
   <title>SafeTune</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300e5ff'><path d='M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z'/></svg>">
   <style>
     :root {
       --bg: #0a0a0a; --surface: #161616; --surface2: #1f1f1f;
       --accent: #00e5ff; --text: #ffffff; --text-sec: #888888;
+      --radius: 12px;
     }
     body.sunset { --accent: #ff7b00; }
     body.matrix { --accent: #00ff41; }
     
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, sans-serif; padding-bottom: 80px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, sans-serif; padding-bottom: 90px; }
+
+    header { padding: 20px; display: flex; justify-content: space-between; align-items: center; background: var(--surface); position: sticky; top: 0; z-index: 10; border-bottom: 1px solid #222; }
+    .logo { font-size: 1.4rem; font-weight: 800; color: var(--accent); letter-spacing: -1px; }
+    .theme-btn { background: var(--surface2); border: none; color: var(--text-sec); padding: 8px 12px; border-radius: 20px; font-size: 0.9rem; cursor: pointer; }
     
-    header { padding: 15px 20px; background: var(--surface); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
-    .logo { font-size: 1.5rem; font-weight: bold; color: var(--accent); }
-    .menu-btn { background: var(--surface2); border: none; color: var(--text); padding: 8px 12px; border-radius: 8px; font-size: 1.2rem; cursor: pointer; }
-    
-    .menu-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; }
-    .menu-panel { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-radius: 20px 20px 0 0; padding: 20px; z-index: 101; max-height: 80vh; overflow-y: auto; }
-    .menu-overlay.open { display: block; }
-    .menu-panel.open { display: block; animation: slideUp 0.3s; }
-    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-    
-    .menu-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .menu-title { font-size: 1.2rem; font-weight: bold; }
-    .close-menu { background: none; border: none; color: var(--text-sec); font-size: 1.5rem; cursor: pointer; }
-    .menu-section { margin-bottom: 20px; }
-    .menu-label { font-size: 0.8rem; color: var(--text-sec); text-transform: uppercase; margin-bottom: 10px; }
-    .theme-grid { display: flex; gap: 10px; }
-    .theme-btn { flex: 1; padding: 12px; border-radius: 10px; border: 2px solid transparent; cursor: pointer; font-weight: bold; text-align: center; }
-    .theme-btn.active { border-color: var(--text); }
-    .theme-blue { background: #00e5ff; color: #000; }
-    .theme-orange { background: #ff7b00; color: #000; }
-    .theme-green { background: #00ff41; color: #000; }
-    .genre-list { display: flex; flex-wrap: wrap; gap: 8px; }
-    .genre-chip { background: var(--surface2); padding: 8px 14px; border-radius: 20px; cursor: pointer; }
-    
+    .theme-menu { display: none; position: absolute; top: 60px; right: 20px; background: var(--surface2); border-radius: 10px; padding: 10px; border: 1px solid #333; z-index: 20; }
+    .theme-menu.open { display: block; }
+    .theme-opt { padding: 10px 15px; cursor: pointer; border-radius: 5px; }
+
     main { padding: 20px; max-width: 800px; margin: 0 auto; }
-    h1 { text-align: center; margin: 20px 0 5px; font-size: 2rem; }
+    h1 { text-align: center; margin-bottom: 5px; font-size: 2rem; }
     h1 span { color: var(--accent); }
-    .sub { text-align: center; color: var(--text-sec); margin-bottom: 25px; }
-    .section-title { font-size: 1.1rem; font-weight: bold; margin: 20px 0 10px; color: var(--accent); }
+    p.sub { text-align: center; color: var(--text-sec); margin-bottom: 25px; }
+
+    .section-title { font-size: 1.1rem; font-weight: bold; margin: 20px 0 10px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+    
+    .tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; margin-bottom: 15px; }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab { background: var(--surface2); padding: 8px 16px; border-radius: 20px; white-space: nowrap; color: var(--text-sec); cursor: pointer; font-size: 0.9rem; border: 1px solid transparent; }
+    .tab.active { background: var(--accent); color: #000; font-weight: bold; }
+
     .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
-    .search-box input { flex: 1; background: var(--surface2); border: 1px solid #333; padding: 12px; border-radius: 10px; color: #fff; font-size: 1rem; }
-    .search-box button { background: var(--accent); color: #000; border: none; padding: 0 20px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1.2rem; }    
-    .track { display: flex; align-items: center; gap: 12px; background: var(--surface); padding: 10px; border-radius: 10px; margin-bottom: 8px; }
+    .search-box input { flex: 1; background: var(--surface2); border: 1px solid #333; padding: 12px; border-radius: var(--radius); color: #fff; font-size: 1rem; outline: none; }
+    .search-box button { background: var(--accent); color: #000; border: none; padding: 0 20px; border-radius: var(--radius); font-weight: bold; cursor: pointer; font-size: 1.2rem; }
+
+    /* Track List */
+    .track { display: flex; align-items: center; gap: 12px; background: var(--surface); padding: 10px; border-radius: var(--radius); margin-bottom: 8px; }
     .track img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; }
     .info { flex: 1; min-width: 0; }
-    .name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .artist { color: var(--text-sec); font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .name { font-weight: 600; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }    .artist { color: var(--text-sec); font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    
+    .duration { color: var(--text-sec); font-size: 0.75rem; margin-right: 8px; font-family: monospace; }
+    
     .actions { display: flex; gap: 8px; align-items: center; }
-    .duration { color: var(--text-sec); font-size: 0.75rem; margin-right: 6px; font-family: monospace; }
     
-    .btn-icon { background: var(--surface2); border: none; color: var(--text); width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1rem; }
-    .btn-play { background: var(--accent); color: #000; }
-    .btn-play.playing { background: var(--text-sec); color: var(--accent); border: 2px solid var(--accent); }
+    /* Улучшенный дизайн кнопок */
+    .btn-icon { 
+      background: var(--surface2); border: none; color: var(--text); 
+      width: 38px; height: 38px; border-radius: 50%; 
+      display: flex; align-items: center; justify-content: center; 
+      cursor: pointer; font-size: 1rem; transition: all 0.2s; 
+    }
+    
+    /* Стильная кнопка Play */
+    .btn-play { 
+      background: var(--accent); color: #000; 
+      box-shadow: 0 0 10px var(--accent); /* Свечение */
+    }
+    .btn-play:active { transform: scale(0.9); }
+    .btn-play.playing { 
+      background: var(--text-sec); color: var(--accent); 
+      box-shadow: none; border: 2px solid var(--accent);
+    }
+    
     .btn-fav.active { color: #ff4545; }
-    
-    .player-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #181818; border-top: 1px solid #333; padding: 10px 15px; display: none; align-items: center; gap: 12px; z-index: 50; }
+
+    /* Mini Player Bar */
+    .player-bar { 
+      position: fixed; bottom: 0; left: 0; right: 0; 
+      background: #181818; border-top: 1px solid #333; 
+      padding: 10px 15px; display: none; align-items: center; gap: 12px; 
+      z-index: 50; cursor: pointer; box-shadow: 0 -5px 15px rgba(0,0,0,0.5); 
+    }
     .player-bar.active { display: flex; }
-    .p-img { width: 45px; height: 45px; border-radius: 6px; }
-    .p-info { flex: 1; }
-    .p-name { font-size: 0.9rem; font-weight: bold; }
-    .p-art { font-size: 0.75rem; color: var(--text-sec); }
-    .p-controls { display: flex; gap: 15px; }
-    .p-btn { background: none; border: none; color: #fff; cursor: pointer; padding: 5px; }
-    .p-btn-play { background: var(--accent); color: #000; border-radius: 50%; width: 36px; height: 36px; }
+    .p-img { width: 45px; height: 45px; border-radius: 6px; flex-shrink: 0; }
+    .p-info { flex: 1; min-width: 0; }
+    .p-name { font-size: 0.9rem; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .p-art { font-size: 0.75rem; color: var(--text-sec); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     
-    .loading, .empty { text-align: center; padding: 40px; color: var(--text-sec); }
+    .p-controls { display: flex; align-items: center; gap: 15px; }
+    .p-btn { background: none; border: none; color: #fff; cursor: pointer; padding: 5px; display: flex; align-items: center; justify-content: center; }
+    .p-btn-play { background: var(--accent); color: #000; border-radius: 50%; width: 36px; height: 36px; box-shadow: 0 0 8px var(--accent); }
+
+    /* Full Modal Player */
+    .modal { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 100; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+    .modal.open { display: flex; }
+    .close-modal { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--text-sec); font-size: 2rem; cursor: pointer; z-index: 101; }
+    .m-cover { width: 85%; max-width: 320px; aspect-ratio: 1; border-radius: 20px; margin-bottom: 25px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); object-fit: cover; }
+    .m-title { font-size: 1.4rem; font-weight: bold; text-align: center; margin-bottom: 5px; }    .m-artist { color: var(--text-sec); margin-bottom: 30px; font-size: 1rem; }
+    
+    .eq-box { display: flex; gap: 4px; height: 20px; align-items: flex-end; margin-bottom: 25px; }
+    .bar { width: 4px; background: var(--accent); height: 4px; border-radius: 2px; }
+    .playing .bar { animation: bounce 0.8s infinite ease-in-out alternate; }
+    .bar:nth-child(1) { animation-delay: 0s; }
+    .bar:nth-child(2) { animation-delay: 0.2s; }
+    .bar:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce { 0% { height: 4px; } 100% { height: 20px; } }
+
+    .modal-controls { display: flex; gap: 40px; align-items: center; margin-bottom: 30px; }
+    .modal-btn { background: none; border: none; color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .modal-btn-lg { width: 70px; height: 70px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px var(--accent); }
+
+    .progress-bar { width: 100%; max-width: 350px; display: flex; align-items: center; gap: 12px; }
+    .time { font-size: 0.8rem; color: var(--text-sec); font-family: monospace; min-width: 40px; text-align: center; }
+    input[type=range] { flex: 1; height: 4px; -webkit-appearance: none; background: #333; border-radius: 2px; }
+    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; background: var(--accent); border-radius: 50%; cursor: pointer; }
+
+    .loading { text-align: center; padding: 40px; color: var(--text-sec); }
   </style>
 </head>
 <body>
 
 <header>
   <div class="logo">🎵 SafeTune</div>
-  <button class="menu-btn" onclick="toggleMenu()">☰</button>
+  <button class="theme-btn" onclick="toggleMenu()">🎨 Тема</button>
+  <div class="theme-menu" id="themeMenu">
+    <div class="theme-opt" onclick="setTheme('')">🔵 Синяя</div>
+    <div class="theme-opt" onclick="setTheme('sunset')">🟠 Оранжевая</div>
+    <div class="theme-opt" onclick="setTheme('matrix')">🟢 Матрица</div>
+  </div>
 </header>
-
-<div class="menu-overlay" id="menuOverlay" onclick="closeMenuOnOverlay(event)"></div>
-<div class="menu-panel" id="menuPanel">
-  <div class="menu-header">
-    <div class="menu-title">⚙️ Меню</div>
-    <button class="close-menu" onclick="toggleMenu()">✕</button>
-  </div>
-  
-  <div class="menu-section">
-    <div class="menu-label">🎨 Тема</div>
-    <div class="theme-grid">
-      <div class="theme-btn theme-blue active" onclick="setTheme('')">Синяя</div>
-      <div class="theme-btn theme-orange" onclick="setTheme('sunset')">Оранжевая</div>
-      <div class="theme-btn theme-green" onclick="setTheme('matrix')">Матрица</div>
-    </div>
-  </div>
-    <div class="menu-section">
-    <div class="menu-label">🎵 Жанры</div>
-    <div class="genre-list">
-      <div class="genre-chip" onclick="loadGenre('Rock'); toggleMenu();">🎸 Рок</div>
-      <div class="genre-chip" onclick="loadGenre('Pop'); toggleMenu();">🎤 Поп</div>
-      <div class="genre-chip" onclick="loadGenre('Electronic'); toggleMenu();">🎛️ Электро</div>
-      <div class="genre-chip" onclick="loadGenre('Lo-Fi'); toggleMenu();">☕ Ло-фай</div>
-    </div>
-  </div>
-  
-  <div class="menu-section">
-    <div class="menu-label">❤️ Избранное</div>
-    <div class="genre-chip" onclick="showFavorites(); toggleMenu();" style="text-align:center; padding:10px;">Открыть избранное</div>
-  </div>
-</div>
 
 <main>
   <h1>Safe<span>Tune</span></h1>
-  <div class="sub">Музыка для твоего контента</div>
-  
-  <div class="section-title">🔥 Популярное</div>
-  <div id="list"><div class="loading">Загрузка...</div></div>
-  
-  <div class="section-title" style="margin-top:30px;">🔍 Поиск</div>
-  <div class="search-box">
-    <input type="text" id="search" placeholder="Название, автор...">
+  <p class="sub">Музыка для твоего контента</p>
+
+  <div class="section-title">🔥 Популярное сейчас</div>
+  <div id="popular-list"><div class="loading">Загрузка...</div></div>
+
+  <div class="section-title">🎵 Жанры</div>
+  <div class="tabs" id="tabs">
+    <div class="tab active" onclick="searchGenre('')">🔥 Все</div>
+    <div class="tab" onclick="searchGenre('Rock')">🎸 Рок</div>
+    <div class="tab" onclick="searchGenre('Pop')">🎤 Поп</div>
+    <div class="tab" onclick="searchGenre('Electronic')">🎛️ Электро</div>
+  </div>
+
+  <div class="search-box">    <input type="text" id="searchInput" placeholder="Поиск...">
     <button onclick="doSearch()">🔍</button>
   </div>
+
+  <div id="search-results"></div>
 </main>
 
-<div class="player-bar" id="playerBar">
-  <img id="pImg" class="p-img" src="">
+<!-- Mini Player -->
+<div class="player-bar" id="miniPlayer" onclick="openFullPlayer()">
+  <img id="miniImg" class="p-img" src="">
   <div class="p-info">
-    <div id="pName">—</div>
-    <div id="pArtist" style="font-size:0.75rem; color:var(--text-sec)">—</div>
+    <div class="p-name" id="miniName">—</div>
+    <div class="p-art" id="miniArt">—</div>
   </div>
-  <div class="p-controls">
-    <button class="p-btn p-btn-play" id="pBtn" onclick="togglePlay()">▶</button>
-    <button class="p-btn" onclick="next()">⏭</button>
+  <div class="p-controls" onclick="event.stopPropagation()">
+    <button class="p-btn p-btn-play" id="miniPlayBtn">▶</button>
+    <button class="p-btn" onclick="playNext()">⏭</button>
+  </div>
+</div>
+
+<!-- Full Modal -->
+<div class="modal" id="fullPlayer">
+  <button class="close-modal" onclick="closeFullPlayer()">✕</button>
+  <img id="fullImg" class="m-cover" src="">
+  <div class="eq-box" id="eqBox">
+    <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+  </div>
+  <div class="m-title" id="fullName">—</div>
+  <div class="m-artist" id="fullArt">—</div>
+  
+  <div class="modal-controls">
+    <button class="modal-btn" onclick="playPrev()">⏮</button>
+    <button class="modal-btn modal-btn-lg" onclick="togglePlay()" id="fullPlayBtn">▶</button>
+    <button class="modal-btn" onclick="playNext()">⏭</button>
+  </div>
+
+  <div class="progress-bar">
+    <span class="time" id="curTime">0:00</span>
+    <input type="range" id="seekBar" value="0">
+    <span class="time" id="durTime">0:00</span>
   </div>
 </div>
 
 <audio id="audio"></audio>
 
 <script>
-const API = '64794605';
-let tracks = [], idx = -1, playing = false, activeId = null;
-let favs = JSON.parse(localStorage.getItem('favs')||'[]');
+  const API_KEY = '64794605';
+  let tracks = [], currentIdx = -1, isPlaying = false;
+  let favorites = JSON.parse(localStorage.getItem('favs') || '[]');
+  let activeTrackId = null; // Храним ID играющего трека, а не только индекс
+  window.onload = () => {
+    const savedTheme = localStorage.getItem('theme') || '';
+    document.body.className = savedTheme;
+    loadPopular();
+  };
 
-window.onload = () => {  const t = localStorage.getItem('theme')||'';
-  setTheme(t, false);
-  loadPopular();
+  function toggleMenu() { document.getElementById('themeMenu').classList.toggle('open'); }
+  function setTheme(t) { document.body.className = t; localStorage.setItem('theme', t); toggleMenu(); }
+
+  async function loadPopular() {
+    await fetchTracks(`https://api.jamendo.com/v3.0/tracks/?client_id=${API_KEY}&format=json&limit=10&order=popularity_total`, 'popular-list');
+  }
+
+  async function searchGenre(genre) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    await fetchTracks(`https://api.jamendo.com/v3.0/tracks/?client_id=${API_KEY}&format=json&limit=20&search=${genre}&order=popularity_total`, 'search-results');
+  }
+
+  async function doSearch() {
+    const q = document.getElementById('searchInput').value;
+    if(!q) return;
+    await fetchTracks(`https://api.jamendo.com/v3.0/tracks/?client_id=${API_KEY}&format=json&limit=20&search=${q}&order=popularity_total`, 'search-results');
+  }
+
+  async function fetchTracks(url, targetId) {
+    const el = document.getElementById(targetId);
+    el.innerHTML = '<div class="loading">Загрузка...</div>';
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      tracks = data.results || [];
+      el.innerHTML = tracks.map((t, i) => renderTrack(t, i)).join('');
+    } catch(e) { el.innerHTML = '<div class="loading">Ошибка</div>'; }
+  }
+
+  function renderTrack(t, i) {
+    const isFav = favorites.includes(t.id);
+    const duration = formatDuration(t.duration);
+    return `
+      <div class="track">
+        <img src="${t.image}">
+        <div class="info">
+          <div class="name">${t.name}</div>
+          <div class="artist">${t.artist_name}</div>
+        </div>
+        <div class="actions">
+          <button class="btn-icon btn-fav ${isFav?'active':''}" onclick="toggleFav(${t.id}, this)">♥</button>
+          <button class="btn-icon btn-play" data-id="${t.id}" onclick="playTrackById(${t.id})">▶</button>          <div class="duration">${duration}</div>
+          <button class="btn-icon" onclick="download('${t.audiodownload}', '${t.name.replace(/'/g,"")}')">⬇</button>
+        </div>
+      </div>`;
+  }
+
+  function toggleFav(id, btn) {
+    if(favorites.includes(id)) { favorites = favorites.filter(x => x!==id); btn.classList.remove('active'); }
+    else { favorites.push(id); btn.classList.add('active'); }
+    localStorage.setItem('favs', JSON.stringify(favorites));
+  }
+
+  // --- AUDIO LOGIC ---
+  window.playTrackById = function(id) {
+    const track = tracks.find(t => t.id === id);
+    if(track) {
+      currentIdx = tracks.indexOf(track);
+      activeTrackId = id;
+      
+      const audio = document.getElementById('audio');
+      audio.src = track.audio;
+      audio.play().catch(e => console.error("Play error:", e));
+      
+      isPlaying = true;
+      updateUI(track);
+      updatePlayButtons();
+    }
+  };
+
+  function updateUI(t) {
+    document.getElementById('miniName').textContent = t.name;
+    document.getElementById('miniArt').textContent = t.artist_name;
+    document.getElementById('miniImg').src = t.image;
+    document.getElementById('fullName').textContent = t.name;
+    document.getElementById('fullArt').textContent = t.artist_name;
+    document.getElementById('fullImg').src = t.image;
+    document.getElementById('miniPlayer').classList.add('active');
+  }
+
+  function updatePlayButtons() {
+    const icon = isPlaying ? '⏸' : '▶';
+    document.getElementById('miniPlayBtn').textContent = icon;
+    document.getElementById('fullPlayBtn').textContent = icon;
+    
+    const modal = document.getElementById('fullPlayer');
+    if(isPlaying) modal.classList.add('playing');
+    else modal.classList.remove('playing');
+    
+    // Ищем кнопку с нужным ID и меняем её
+    document.querySelectorAll('.btn-play').forEach(btn => {      const btnId = btn.getAttribute('data-id');
+      if(btnId == activeTrackId) {
+        btn.innerHTML = icon;
+        if(isPlaying) btn.classList.add('playing');
+        else btn.classList.remove('playing');
+      } else {
+        btn.innerHTML = '▶';
+        btn.classList.remove('playing');
+      }
+    });
+  }
+
+  window.togglePlay = function() {
+    const audio = document.getElementById('audio');
+    if(!audio.src) return;
+    if(audio.paused) { 
+      audio.play(); isPlaying = true; 
+    } else { 
+      audio.pause(); isPlaying = false; 
+    }
+    updatePlayButtons();
+  };
+
+  window.playNext = function() {
+    if(currentIdx < tracks.length - 1) {
+      playTrackById(tracks[currentIdx + 1].id);
+    }
+  };
   
-  document.getElementById('list').addEventListener('click', function(e) {
-    const fav = e.target.closest('.btn-fav');
-    const play = e.target.closest('.btn-play');
-    if(fav) { toggleFav(parseInt(fav.dataset.id), fav); e.stopPropagation(); }
-    if(play) { playTrack(parseInt(play.dataset.id)); e.stopPropagation(); }
-  });
-};
+  window.playPrev = function() {
+    if(currentIdx > 0) {
+      playTrackById(tracks[currentIdx - 1].id);
+    }
+  };
 
-function toggleMenu() {
-  const overlay = document.getElementById('menuOverlay');
-  const panel = document.getElementById('menuPanel');
-  overlay.classList.toggle('open');
-  panel.classList.toggle('open');
-}
-
-function closeMenuOnOverlay(e) {
-  if(e.target === e.currentTarget) toggleMenu();
-}
-
-function setTheme(t, save=true) {
-  document.body.className = t;
-  if(save) localStorage.setItem('theme', t);
-  document.querySelectorAll('.theme-btn').forEach(b=>b.classList.remove('active'));
-  if(t==='sunset') document.querySelector('.theme-orange').classList.add('active');
-  else if(t==='matrix') document.querySelector('.theme-green').classList.add('active');
-  else document.querySelector('.theme-blue').classList.add('active');
-}
-
-async function loadPopular() {
-  document.getElementById('list').innerHTML = '<div class="loading">Загрузка...</div>';
-  try {
-    const r = await fetch(`https://api.jamendo.com/v3.0/tracks/?client_id=${API}&format=json&limit=15&order=popularity_total`);
-    const d = await r.json();
-    tracks = d.results || [];
-    render(tracks);
-  } catch(e) {
-    document.getElementById('list').innerHTML = '<div class="empty">Ошибка. Проверь интернет.</div>';
-  }
-}
-
-window.loadGenre = function(g) {
-  document.getElementById('list').innerHTML = '<div class="loading">Загрузка...</div>';
-  fetch(`https://api.jamendo.com/v3.0/tracks/?client_id=${API}&format=json&limit=20&search=${encodeURIComponent(g)}&order=popularity_total`)
-    .then(r=>r.json())
-    .then(d=>{ tracks=d.results||[]; render(tracks); })
-    .catch(()=>document.getElementById('list').innerHTML='<div class="empty">Ошибка</div>');};
-
-window.doSearch = function() {
-  const q = document.getElementById('search').value.trim();
-  if(!q) return;
-  document.getElementById('list').innerHTML = '<div class="loading">Поиск...</div>';
-  fetch(`https://api.jamendo.com/v3.0/tracks/?client_id=${API}&format=json&limit=20&search=${encodeURIComponent(q)}&order=popularity_total`)
-    .then(r=>r.json())
-    .then(d=>{ tracks=d.results||[]; render(tracks); })
-    .catch(()=>document.getElementById('list').innerHTML='<div class="empty">Ошибка</div>');
-};
-
-window.showFavorites = function() {
-  render(favs);
-};
-
-function render(list) {
-  if(!list.length) {
-    document.getElementById('list').innerHTML = '<div class="empty">Ничего не найдено</div>';
-    return;
-  }
-  document.getElementById('list').innerHTML = list.map(t=>{
-    const isFav = favs.some(f=>f.id===t.id);
-    return `<div class="track">
-      <img src="${t.image}">
-      <div class="info">
-        <div class="name">${t.name}</div>
-        <div class="artist">${t.artist_name}</div>
-      </div>
-      <div class="actions">
-        <button class="btn-icon btn-fav ${isFav?'active':''}" data-id="${t.id}">♥</button>
-        <button class="btn-icon btn-play" data-id="${t.id}">▶</button>
-        <div class="duration">${fmtDur(t.duration)}</div>
-      </div>
-    </div>`;
-  }).join('');
-  updateButtons();
-}
-
-window.toggleFav = function(id, btn) {
-  const t = tracks.find(x=>x.id===id) || favs.find(x=>x.id===id);
-  if(!t) return;
-  const i = favs.findIndex(x=>x.id===id);
-  if(i>=0) { favs.splice(i,1); if(btn) btn.classList.remove('active'); }
-  else { favs.push(t); if(btn) btn.classList.add('active'); }
-  localStorage.setItem('favs', JSON.stringify(favs));
-};
-
-window.playTrack = function(id) {
-  const t = tracks.find(x=>x.id===id) || favs.find(x=>x.id===id);  if(!t) return;
-  if(!tracks.includes(t)) tracks.push(t);
-  idx = tracks.indexOf(t);
-  activeId = id;
+  document.getElementById('audio').onended = window.playNext;
   
   const audio = document.getElementById('audio');
-  audio.src = t.audio;
-  audio.play();
-  playing = true;
+  const seekBar = document.getElementById('seekBar');
   
-  document.getElementById('pName').textContent = t.name;
-  document.getElementById('pArtist').textContent = t.artist_name;
-  document.getElementById('pImg').src = t.image;
-  document.getElementById('playerBar').classList.add('active');
+  audio.ontimeupdate = () => {
+    if(audio.duration) {
+      seekBar.value = (audio.currentTime / audio.duration) * 100;
+      document.getElementById('curTime').textContent = formatTime(audio.currentTime);
+      document.getElementById('durTime').textContent = formatTime(audio.duration);
+    }
+  };
   
-  updateButtons();
-};
+  seekBar.oninput = () => {
+    if(audio.duration) audio.currentTime = (seekBar.value / 100) * audio.duration;  };
 
-function updateButtons() {
-  document.querySelectorAll('.btn-play').forEach(btn=>{
-    const id = parseInt(btn.dataset.id);
-    if(id===activeId && playing) { btn.innerHTML = '⏸'; btn.classList.add('playing'); }
-    else { btn.innerHTML = '▶'; btn.classList.remove('playing'); }
-  });
-  document.getElementById('pBtn').textContent = playing ? '⏸' : '▶';
-}
+  function formatTime(s) {
+    const m = Math.floor(s/60);
+    const sec = Math.floor(s%60);
+    return m + ':' + (sec<10?'0':'') + sec;
+  }
 
-window.togglePlay = function() {
-  const audio = document.getElementById('audio');
-  if(audio.paused) { audio.play(); playing=true; }
-  else { audio.pause(); playing=false; }
-  updateButtons();
-};
+  function formatDuration(s) {
+    if(!s) return "0:00";
+    const m = Math.floor(s/60);
+    const sec = Math.floor(s%60);
+    return m + ':' + (sec<10?'0':'') + sec;
+  }
 
-window.next = function() {
-  if(idx < tracks.length-1) playTrack(tracks[idx+1].id);
-};
+  window.openFullPlayer = function() { document.getElementById('fullPlayer').classList.add('open'); };
+  window.closeFullPlayer = function() { document.getElementById('fullPlayer').classList.remove('open'); };
 
-document.getElementById('audio').onended = next;
-function fmtDur(s) { if(!s) return '0:00'; const m=Math.floor(s/60), sec=Math.floor(s%60); return m+':'+(sec<10?'0':'')+sec; }
+  window.download = function(url, name) {
+    if(!url) return;
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name + '.mp3';
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
 </script>
 
 </body>
