@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0a0a0a">
+  <title>SafeTune</title>
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300e5ff'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E">
+  <!-- iOS Support -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    /* --- THEMES --- */
+    :root {
+      --bg: #0a0a0a; --surface: #111111; --surface2: #1a1a1a; --border: #222222;
+      --accent: #00e5ff; --accent-dim: rgba(0, 229, 255, 0.12);
+      --text: #f0f0f0; --text-muted: #666666; --text-sub: #999999;
+      --danger: #ff4545; --success: #00c853;
+      --heart-color: #ff4545;
+    }
+    
+    /* Orange Theme */
+    body.theme-sunset {
+      --accent: #ff7b00;
+      --accent-dim: rgba(255, 123, 0, 0.15);
+      --heart-color: #ff4500;
+    }
+    /* Matrix Theme */
+    body.theme-matrix {
+      --accent: #00ff41;
+      --accent-dim: rgba(0, 255, 65, 0.15);
+      --heart-color: #00ff41;
+      --bg: #050505;
+    }
+
+    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; display: flex; flex-direction: column; transition: background 0.3s; }
+    
+    /* Header & Theme Switcher */
+    header { display: flex; align-items: center; justify-content: space-between; padding: 18px 16px; border-bottom: 1px solid var(--border); background: var(--surface); position: sticky; top: 0; z-index: 100; }
+    .logo { display: flex; align-items: center; gap: 10px; font-size: 1.25rem; font-weight: 700; }
+    .logo svg { color: var(--accent); width: 24px; }
+    .theme-btn { background: var(--surface2); color: var(--text-sub); border: 1px solid var(--border); padding: 6px 10px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; }
+    
+    /* Theme Dropdown */
+    .theme-menu { display: none; position: absolute; top: 60px; right: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 8px; z-index: 200; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }    .theme-menu.open { display: block; }
+    .theme-option { padding: 8px 12px; cursor: pointer; border-radius: 6px; display: flex; align-items: center; gap: 8px; }
+    .theme-option:hover { background: var(--surface2); }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+
+    /* Main Content */
+    main { flex: 1; padding: 20px 16px 100px 16px; max-width: 800px; margin: 0 auto; width: 100%; }
+    .hero { text-align: center; margin-bottom: 24px; }
+    .hero h1 { font-size: 1.8rem; font-weight: 800; }
+    .hero h1 span { color: var(--accent); }
+    .hero p { color: var(--text-sub); font-size: 0.9rem; margin-top: 4px; }
+
+    /* Tabs */
+    .tabs-container { margin-bottom: 20px; }
+    .genre-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .genre-tabs::-webkit-scrollbar { display: none; }
+    .tab { background: var(--surface2); color: var(--text-sub); padding: 8px 16px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; border: 1px solid transparent; cursor: pointer; font-size: 0.9rem; }
+    .tab.active { background: var(--accent-dim); color: var(--accent); border-color: rgba(255,255,255,0.1); }
+    .tab-fav { border-color: var(--border); color: var(--text); }
+    .tab-fav.active { color: var(--heart-color); border-color: var(--heart-color); background: rgba(255, 69, 69, 0.1); }
+
+    /* Search & Filters */
+    .controls { display: flex; gap: 8px; margin-bottom: 16px; }
+    .search-wrap { flex: 1; position: relative; }
+    .search-wrap input { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; color: var(--text); padding: 12px 14px 12px 40px; outline: none; }
+    .search-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+    .btn-search { background: var(--accent); color: #000; border: none; border-radius: 10px; padding: 0 20px; font-weight: 600; cursor: pointer; }
+    
+    .filter-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 20px; }
+    .filter-row select { background: var(--surface); color: var(--text-sub); border: 1px solid var(--border); padding: 8px; border-radius: 8px; font-size: 0.85rem; }
+
+    /* Track List */
+    .track-item { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
+    .track-art { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; background: var(--surface2); flex-shrink: 0; }
+    .track-info { flex: 1; min-width: 0; }
+    .track-name { font-weight: 600; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .track-artist { color: var(--text-sub); font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .track-actions { display: flex; align-items: center; gap: 8px; }
+    
+    .btn-play { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: #000; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .btn-fav { background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; font-size: 1.2rem; transition: 0.2s; }
+    .btn-fav.active { color: var(--heart-color); transform: scale(1.1); }
+    .btn-dl { background: var(--surface2); color: var(--accent); border: 1px solid var(--border); padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; text-decoration: none; display: flex; align-items: center; gap: 4px; }
+    
+    /* Player Bar */
+    #player-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); padding: 12px 16px; display: flex; align-items: center; gap: 12px; z-index: 300; cursor: pointer; }
+    #player-bar.visible { display: flex; }
+    .player-cover { width: 40px; height: 40px; border-radius: 6px; }
+    .player-info { flex: 1; }
+    .player-name { font-size: 0.9rem; font-weight: 600; }    .player-artist { font-size: 0.8rem; color: var(--text-sub); }
+    .player-controls button { background: transparent; border: none; color: var(--text); font-size: 1.5rem; cursor: pointer; padding: 0 4px; }
+
+    /* Full Screen Modal */
+    #player-modal { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 400; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+    #player-modal.open { display: flex; }
+    .modal-cover { width: 100%; max-width: 350px; aspect-ratio: 1; border-radius: 20px; object-fit: cover; margin-bottom: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+    .modal-name { font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; text-align: center; }
+    .modal-artist { color: var(--text-sub); margin-bottom: 30px; text-align: center; }
+    .modal-close { position: absolute; top: 20px; right: 20px; background: transparent; border: none; color: var(--text-sub); font-size: 1.5rem; cursor: pointer; }
+
+    /* States */
+    .state { text-align: center; padding: 40px; color: var(--text-muted); }
+    .spinner { width: 30px; height: 30px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 10px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+    SafeTune
+  </div>
+  <button class="theme-btn" onclick="toggleThemeMenu()">🎨 Theme</button>
+  
+  <!-- Theme Menu -->
+  <div class="theme-menu" id="theme-menu">
+    <div class="theme-option" onclick="setTheme('default')"><span class="dot" style="background:#00e5ff"></span> Neon Blue</div>
+    <div class="theme-option" onclick="setTheme('sunset')"><span class="dot" style="background:#ff7b00"></span> Sunset Orange</div>
+    <div class="theme-option" onclick="setTheme('matrix')"><span class="dot" style="background:#00ff41"></span> Matrix Green</div>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <h1>Safe<span>Tune</span></h1>
+    <p>Безопасная музыка для контента</p>
+  </div>
+
+  <div class="tabs-container">
+    <div class="genre-tabs" id="tabs">
+      <div class="tab tab-fav active" data-type="fav">❤️ Избранное</div>
+      <div class="tab" data-genre="Rock">🎸 Rock</div>
+      <div class="tab" data-genre="Pop">🎤 Pop</div>
+      <div class="tab" data-genre="Lo-Fi">☕ Lo-Fi</div>
+      <div class="tab" data-genre="Electronic">🎛️ Techno</div>
+      <div class="tab" data-genre="Hip-Hop">🎤 Hip-Hop</div>
+    </div>  </div>
+
+  <div class="controls">
+    <div class="search-wrap">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="search-input" placeholder="Поиск...">
+    </div>
+    <button class="btn-search" id="search-btn">🔍</button>
+  </div>
+
+  <div class="filter-row">
+    <select id="sort-select"><option value="popularity_total">Популярное</option><option value="releasedate">Новое</option></select>
+    <select id="limit-select"><option value="20">20 треков</option><option value="50">50 треков</option></select>
+  </div>
+
+  <div id="loading" class="state hidden"><div class="spinner"></div>Загрузка...</div>
+  <div id="empty" class="state">Выбери жанр или введи запрос</div>
+  <div id="list"></div>
+</main>
+
+<!-- Mini Player -->
+<div id="player-bar" onclick="openModal()">
+  <img id="mini-cover" class="player-cover" src="" />
+  <div class="player-info">
+    <div class="player-name" id="mini-name">—</div>
+    <div class="player-artist" id="mini-artist">—</div>
+  </div>
+  <div class="player-controls">
+    <button onclick="event.stopPropagation(); togglePlay()">⏯</button>
+    <button onclick="event.stopPropagation(); playNext()">⏭</button>
+  </div>
+</div>
+
+<!-- Full Modal -->
+<div id="player-modal">
+  <button class="modal-close" onclick="closeModal()">✕</button>
+  <img id="modal-cover" class="modal-cover" src="" />
+  <div class="modal-name" id="modal-name">—</div>
+  <div class="modal-artist" id="modal-artist">—</div>
+  <div class="controls" style="gap: 20px; display: flex;">
+    <button onclick="playPrev()" style="font-size:2rem; background:none; border:none; color:var(--text); cursor:pointer;">⏮</button>
+    <button onclick="togglePlay()" id="play-btn-lg" style="font-size:2.5rem; background:none; border:none; color:var(--accent); cursor:pointer;">▶</button>
+    <button onclick="playNext()" style="font-size:2rem; background:none; border:none; color:var(--text); cursor:pointer;">⏭</button>
+  </div>
+</div>
+
+<audio id="audio"></audio>
+
+<script>
+  // --- CONFIG ---  const API_KEY = '64794605'; 
+  let tracks = [];
+  let favorites = JSON.parse(localStorage.getItem('safetune_favs') || '[]');
+  let currentIdx = -1;
+  let isPlaying = false;
+  let currentGenre = ''; // '' means search or favorites
+
+  // --- DOM ---
+  const els = {
+    input: document.getElementById('search-input'),
+    btn: document.getElementById('search-btn'),
+    sort: document.getElementById('sort-select'),
+    limit: document.getElementById('limit-select'),
+    list: document.getElementById('list'),
+    loading: document.getElementById('loading'),
+    empty: document.getElementById('empty'),
+    player: document.getElementById('player-bar'),
+    miniName: document.getElementById('mini-name'),
+    miniArtist: document.getElementById('mini-artist'),
+    miniCover: document.getElementById('mini-cover'),
+    modalName: document.getElementById('modal-name'),
+    modalArtist: document.getElementById('modal-artist'),
+    modalCover: document.getElementById('modal-cover'),
+    playBtnLg: document.getElementById('play-btn-lg'),
+    audio: document.getElementById('audio'),
+    tabs: document.getElementById('tabs')
+  };
+
+  // --- INIT ---
+  const savedTheme = localStorage.getItem('safetune_theme') || 'default';
+  setTheme(savedTheme, false);
+
+  els.btn.onclick = () => { currentGenre = ''; search(els.input.value); };
+  els.input.onkeypress = (e) => { if(e.key === 'Enter') { currentGenre = ''; search(els.input.value); } };
+  
+  // Tabs Logic
+  els.tabs.onclick = (e) => {
+    if(!e.target.classList.contains('tab')) return;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    e.target.classList.add('active');
+    
+    if(e.target.dataset.type === 'fav') {
+      renderFavorites();
+    } else {
+      currentGenre = e.target.dataset.genre;
+      search(currentGenre);
+    }
+  };
+
+  // --- API ---  async function search(query) {
+    if(!query) return;
+    els.list.innerHTML = '';
+    els.empty.classList.add('hidden');
+    els.loading.classList.remove('hidden');
+
+    const url = `https://api.jamendo.com/v3.0/tracks/?client_id=${API_KEY}&format=json&limit=${els.limit.value}&imagesize=300&order=${els.sort.value}&search=${encodeURIComponent(query)}`;
+    
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      tracks = data.results || [];
+      renderList(tracks);
+    } catch(e) {
+      console.error(e);
+    } finally {
+      els.loading.classList.add('hidden');
+      if(tracks.length === 0) els.empty.classList.remove('hidden');
+    }
+  }
+
+  function renderList(list) {
+    els.list.innerHTML = '';
+    list.forEach((t, i) => {
+      const isFav = favorites.includes(t.id);
+      const div = document.createElement('div');
+      div.className = 'track-item';
+      div.innerHTML = `
+        <img class="track-art" src="${t.image}" loading="lazy">
+        <div class="track-info">
+          <div class="track-name">${t.name}</div>
+          <div class="track-artist">${t.artist_name}</div>
+        </div>
+        <div class="track-actions">
+          <button class="btn-fav ${isFav?'active':''}" onclick="toggleFav(${t.id}, this)">♥</button>
+          <button class="btn-play" onclick="play(${i})">▶</button>
+          <a href="${t.audiodownload}" class="btn-dl" download>⬇</a>
+        </div>
+      `;
+      els.list.appendChild(div);
+    });
+  }
+
+  function renderFavorites() {
+    els.loading.classList.remove('hidden');
+    els.empty.classList.add('hidden');
+    els.list.innerHTML = '';
+    
+    // Filter tracks if we have them, or show empty if list cleared
+    const favTracks = tracks.filter(t => favorites.includes(t.id));    
+    els.loading.classList.add('hidden');
+    
+    if(favTracks.length === 0) {
+      els.empty.textContent = 'Пока нет избранных треков';
+      els.empty.classList.remove('hidden');
+      return;
+    }
+    renderList(favTracks);
+  }
+
+  function toggleFav(id, btn) {
+    if(favorites.includes(id)) {
+      favorites = favorites.filter(x => x !== id);
+      btn.classList.remove('active');
+    } else {
+      favorites.push(id);
+      btn.classList.add('active');
+    }
+    localStorage.setItem('safetune_favs', JSON.stringify(favorites));
+    
+    // If we are currently in favorites tab, re-render to remove it
+    if(document.querySelector('.tab-fav.active') && favorites.length === 0) {
+      renderFavorites();
+    }
+  }
+
+  // --- PLAYER ---
+  function play(idx) {
+    if(idx < 0 || idx >= tracks.length) return;
+    currentIdx = idx;
+    const t = tracks[idx];
+    els.audio.src = t.audio;
+    els.audio.play();
+    isPlaying = true;
+    updateUI(t);
+  }
+
+  function updateUI(t) {
+    els.miniName.textContent = t.name;
+    els.miniArtist.textContent = t.artist_name;
+    els.miniCover.src = t.image;
+    els.modalName.textContent = t.name;
+    els.modalArtist.textContent = t.artist_name;
+    els.modalCover.src = t.image;
+    els.player.classList.add('visible');
+    els.playBtnLg.textContent = '⏸';
+  }
+
+  function togglePlay() {    if(!els.audio.src) return;
+    if(els.audio.paused) {
+      els.audio.play(); isPlaying = true; els.playBtnLg.textContent = '⏸';
+    } else {
+      els.audio.pause(); isPlaying = false; els.playBtnLg.textContent = '▶';
+    }
+  }
+
+  function playNext() { if(currentIdx < tracks.length - 1) play(currentIdx + 1); }
+  function playPrev() { if(currentIdx > 0) play(currentIdx - 1); }
+
+  els.audio.onended = () => playNext();
+
+  // --- MODAL ---
+  function openModal() { document.getElementById('player-modal').classList.add('open'); }
+  function closeModal() { document.getElementById('player-modal').classList.remove('open'); }
+
+  // --- THEME ---
+  function toggleThemeMenu() {
+    document.getElementById('theme-menu').classList.toggle('open');
+  }
+  
+  function setTheme(name, save = true) {
+    document.body.className = name === 'default' ? '' : `theme-${name}`;
+    if(save) localStorage.setItem('safetune_theme', name);
+    document.getElementById('theme-menu').classList.remove('open');
+  }
+
+  // PWA Service Worker Reg
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(() => console.log('SW skipped'));
+    });
+  }
+</script>
+</body>
+</html>
