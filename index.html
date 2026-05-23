@@ -39,15 +39,32 @@
     .hero h1 span { color: var(--accent); }
     .hero p { color: var(--text-sub); font-size: 0.9rem; margin-top: 4px; }
 
+    .section-title { 
+      font-size: 1.1rem; 
+      font-weight: 700; 
+      margin: 24px 0 16px 0; 
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }    .section-title::before {
+      content: '';
+      width: 4px;
+      height: 20px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+
     .tabs-container { margin-bottom: 20px; }
     .genre-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
     .genre-tabs::-webkit-scrollbar { display: none; }
-    .tab { background: var(--surface2); color: var(--text-sub); padding: 8px 16px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; border: 1px solid transparent; cursor: pointer; font-size: 0.9rem; }
-    .tab.active { background: var(--accent-dim); color: var(--accent); border-color: rgba(255,255,255,0.1); }
+    .tab { background: var(--surface2); color: var(--text-sub); padding: 8px 16px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; border: 1px solid transparent; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; }
+    .tab.active { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
     .tab-fav { border-color: var(--border); color: var(--text); }
     .tab-fav.active { color: var(--heart-color); border-color: var(--heart-color); background: rgba(255, 69, 69, 0.1); }
 
-    .controls { display: flex; gap: 8px; margin-bottom: 16px; }    .search-wrap { flex: 1; position: relative; }
+    .controls { display: flex; gap: 8px; margin-bottom: 16px; }
+    .search-wrap { flex: 1; position: relative; }
     .search-wrap input { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; color: var(--text); padding: 12px 14px 12px 40px; outline: none; }
     .search-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
     .btn-search { background: var(--accent); color: #000; border: none; border-radius: 10px; padding: 0 20px; font-weight: 600; cursor: pointer; }
@@ -55,7 +72,11 @@
     .filter-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 20px; }
     .filter-row select { background: var(--surface); color: var(--text-sub); border: 1px solid var(--border); padding: 8px; border-radius: 8px; font-size: 0.85rem; }
 
-    .track-item { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
+    .track-item { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; animation: slideIn 0.3s ease; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
     .track-art { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; background: var(--surface2); flex-shrink: 0; }
     .track-info { flex: 1; min-width: 0; }
     .track-name { font-weight: 600; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -75,8 +96,7 @@
     .player-artist { font-size: 0.8rem; color: var(--text-sub); }
     .player-controls button { background: transparent; border: none; color: var(--text); font-size: 1.5rem; cursor: pointer; padding: 0 4px; }
 
-    #player-modal { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 400; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
-    #player-modal.open { display: flex; }
+    #player-modal { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 400; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }    #player-modal.open { display: flex; }
     .modal-cover { width: 100%; max-width: 350px; aspect-ratio: 1; border-radius: 20px; object-fit: cover; margin-bottom: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
     .modal-name { font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; text-align: center; }
     .modal-artist { color: var(--text-sub); margin-bottom: 30px; text-align: center; }
@@ -96,7 +116,8 @@
     SafeTune
   </div>
   <button class="theme-btn" id="theme-btn">🎨 Тема</button>
-    <div class="theme-menu" id="theme-menu">
+  
+  <div class="theme-menu" id="theme-menu">
     <div class="theme-option" data-theme="default"><span class="dot" style="background:#00e5ff"></span> Синяя</div>
     <div class="theme-option" data-theme="sunset"><span class="dot" style="background:#ff7b00"></span> Оранжевая</div>
     <div class="theme-option" data-theme="matrix"><span class="dot" style="background:#00ff41"></span> Матрица</div>
@@ -109,6 +130,10 @@
     <p>Безопасная музыка для контента</p>
   </div>
 
+  <div class="section-title">🔥 Популярное сейчас</div>
+  <div id="popular-list"></div>
+
+  <div class="section-title">🎵 Жанры</div>
   <div class="tabs-container">
     <div class="genre-tabs" id="tabs">
       <div class="tab tab-fav active" data-type="fav">❤️ Избранное</div>
@@ -120,8 +145,7 @@
     </div>
   </div>
 
-  <div class="controls">
-    <div class="search-wrap">
+  <div class="controls">    <div class="search-wrap">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input type="text" id="search-input" placeholder="Поиск...">
     </div>
@@ -134,7 +158,7 @@
   </div>
 
   <div id="loading" class="state hidden"><div class="spinner"></div>Загрузка...</div>
-  <div id="empty" class="state">Выбери жанр или введи запрос</div>
+  <div id="empty" class="state hidden">Ничего не найдено</div>
   <div id="list"></div>
 </main>
 
@@ -145,7 +169,8 @@
     <div class="player-artist" id="mini-artist">—</div>
   </div>
   <div class="player-controls">
-    <button onclick="event.stopPropagation(); togglePlay()">⏯</button>    <button onclick="event.stopPropagation(); playNext()">⏭</button>
+    <button onclick="event.stopPropagation(); togglePlay()">⏯</button>
+    <button onclick="event.stopPropagation(); playNext()">⏭</button>
   </div>
 </div>
 
@@ -167,9 +192,9 @@
   // --- CONFIG ---
   const API_KEY = '64794605'; 
   let tracks = [];
+  let popularTracks = [];
   let favorites = JSON.parse(localStorage.getItem('safetune_favs') || '[]');
-  let currentIdx = -1;
-  let currentGenre = '';
+  let currentIdx = -1;  let currentGenre = '';
 
   // --- DOM Elements ---
   const els = {
@@ -178,6 +203,7 @@
     sort: document.getElementById('sort-select'),
     limit: document.getElementById('limit-select'),
     list: document.getElementById('list'),
+    popularList: document.getElementById('popular-list'),
     loading: document.getElementById('loading'),
     empty: document.getElementById('empty'),
     player: document.getElementById('player-bar'),
@@ -194,8 +220,12 @@
     themeMenu: document.getElementById('theme-menu')
   };
 
-  // --- INIT ---  const savedTheme = localStorage.getItem('safetune_theme') || 'default';
+  // --- INIT ---
+  const savedTheme = localStorage.getItem('safetune_theme') || 'default';
   applyTheme(savedTheme);
+
+  // Load popular tracks on startup
+  loadPopularTracks();
 
   els.btn.onclick = () => { currentGenre = ''; search(els.input.value); };
   els.input.onkeypress = (e) => { if(e.key === 'Enter') { currentGenre = ''; search(els.input.value); } };
@@ -213,21 +243,62 @@
   });
 
   document.body.onclick = () => els.themeMenu.classList.remove('open');
-
   els.tabs.onclick = (e) => {
-    if(!e.target.classList.contains('tab')) return;
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    e.target.classList.add('active');
+    const tab = e.target.closest('.tab');
+    if(!tab) return;
     
-    if(e.target.dataset.type === 'fav') {
+    e.stopPropagation();
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    
+    if(tab.dataset.type === 'fav') {
       renderFavorites();
-    } else {
-      currentGenre = e.target.dataset.genre;
+    } else if(tab.dataset.genre) {
+      currentGenre = tab.dataset.genre;
       search(currentGenre);
     }
   };
 
-  // --- LOGIC ---
+  // --- FUNCTIONS ---
+  async function loadPopularTracks() {
+    els.loading.classList.remove('hidden');
+    const url = `https://api.jamendo.com/v3.0/tracks/?client_id=${API_KEY}&format=json&limit=5&imagesize=300&order=popularity_total`;
+    
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      popularTracks = data.results || [];
+      renderPopularTracks();
+    } catch(e) {
+      console.error('Error loading popular:', e);
+    } finally {
+      els.loading.classList.add('hidden');
+    }
+  }
+
+  function renderPopularTracks() {
+    if(popularTracks.length === 0) return;
+    
+    els.popularList.innerHTML = '';
+    popularTracks.slice(0, 5).forEach((t, i) => {
+      const isFav = favorites.includes(t.id);
+      const div = document.createElement('div');
+      div.className = 'track-item';
+      div.innerHTML = `
+        <img class="track-art" src="${t.image}" loading="lazy">
+        <div class="track-info">
+          <div class="track-name">${t.name}</div>
+          <div class="track-artist">${t.artist_name}</div>
+        </div>
+        <div class="track-actions">
+          <button class="btn-fav ${isFav?'active':''}" onclick="toggleFav(${t.id}, this)">♥</button>
+          <button class="btn-play" onclick="playFromPopular(${i})">▶</button>          <a href="${t.audiodownload}" class="btn-dl" download>⬇</a>
+        </div>
+      `;
+      els.popularList.appendChild(div);
+    });
+  }
+
   async function search(query) {
     if(!query) return;
     els.list.innerHTML = '';
@@ -243,7 +314,8 @@
       renderList(tracks);
     } catch(e) {
       console.error(e);
-    } finally {      els.loading.classList.add('hidden');
+    } finally {
+      els.loading.classList.add('hidden');
       if(tracks.length === 0) els.empty.classList.remove('hidden');
     }
   }
@@ -269,7 +341,6 @@
       els.list.appendChild(div);
     });
   }
-
   function renderFavorites() {
     els.loading.classList.remove('hidden');
     els.empty.classList.add('hidden');
@@ -292,8 +363,17 @@
       btn.classList.remove('active');
     } else {
       favorites.push(id);
-      btn.classList.add('active');    }
+      btn.classList.add('active');
+    }
     localStorage.setItem('safetune_favs', JSON.stringify(favorites));
+  };
+
+  window.playFromPopular = function(idx) {
+    if(idx < 0 || idx >= popularTracks.length) return;
+    const t = popularTracks[idx];
+    els.audio.src = t.audio;
+    els.audio.play();
+    updateUI(t);
   };
 
   window.play = function(idx) {
@@ -310,8 +390,7 @@
     els.miniArtist.textContent = t.artist_name;
     els.miniCover.src = t.image;
     els.modalName.textContent = t.name;
-    els.modalArtist.textContent = t.artist_name;
-    els.modalCover.src = t.image;
+    els.modalArtist.textContent = t.artist_name;    els.modalCover.src = t.image;
     els.player.classList.add('visible');
     els.playBtnLg.textContent = '⏸';
   }
@@ -325,8 +404,17 @@
     }
   };
 
-  window.playNext = function() { if(currentIdx < tracks.length - 1) play(currentIdx + 1); };
-  window.playPrev = function() { if(currentIdx > 0) play(currentIdx - 1); };
+  window.playNext = function() { 
+    if(tracks.length === 0) return;
+    currentIdx = (currentIdx + 1) % tracks.length; 
+    play(currentIdx); 
+  };
+  
+  window.playPrev = function() { 
+    if(tracks.length === 0) return;
+    currentIdx = (currentIdx - 1 + tracks.length) % tracks.length; 
+    play(currentIdx); 
+  };
 
   els.audio.onended = () => playNext();
 
@@ -341,7 +429,8 @@
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('sw.js').catch(() => {});
-    });  }
+    });
+  }
 </script>
 </body>
 </html>
