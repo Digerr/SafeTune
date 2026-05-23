@@ -15,7 +15,7 @@
       --surface:  #161616;
       --surface2: #1e1e1e;
       --surface3: #272727;
-      --accent:   #00e5ff; /* Синяя по умолчанию */
+      --accent:   #00e5ff; 
       --text:     #f0f0f0;
       --text2:    #888;
       --text3:    #555;
@@ -110,7 +110,7 @@
     .btn-icon svg { width: 16px; height: 16px; fill: currentColor; }
     
     .btn-fav.active { color: #ff4d6d; }
-    .btn-play { background: var(--accent); color: #000; width: 36px; height: 36px; }
+    .btn-play { background: var(--accent); color: #000; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
     .btn-play:hover { filter: brightness(1.1); }
     .btn-play svg { width: 14px; height: 14px; fill: currentColor; }
     .btn-play.playing { background: var(--surface3); color: var(--accent); border: 1px solid rgba(255,255,255,0.1); }
@@ -125,7 +125,7 @@
       border-top: 1px solid rgba(255,255,255,0.06); padding: 0 16px;
       display: none; align-items: center; gap: 12px; z-index: 50; cursor: pointer;
       box-shadow: 0 -10px 30px rgba(0,0,0,0.3);
-      padding-bottom: env(safe-area-inset-bottom); /* Фикс для айфонов */
+      padding-bottom: env(safe-area-inset-bottom);
     }
     .player-bar.active { display: flex; }
     .p-img { width: 46px; height: 46px; border-radius: var(--r-sm); object-fit: cover; flex-shrink: 0; }
@@ -170,7 +170,7 @@
     .modal-btn { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text); transition: background .15s; }
     .modal-btn:hover { background: var(--surface2); }
     .modal-btn svg { width: 20px; height: 20px; fill: currentColor; }
-    .modal-btn-lg { width: 64px; height: 64px; background: var(--accent); color: #000; }
+    .modal-btn-lg { width: 64px; height: 64px; background: var(--accent); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
     .modal-btn-lg:hover { background: var(--accent); filter: brightness(1.1); }
     .modal-btn-lg svg { width: 24px; height: 24px; }
 
@@ -214,9 +214,6 @@
     <button onclick="doSearch()">Поиск</button>
   </div>
 
-  <div class="section-title">🔥 Популярные треки</div>
-  <div id="popular-list" class="track-list"><div class="loading">Загрузка треков...</div></div>
-
   <div class="section-title">⚡ Жанры</div>
   <div class="tabs" id="tabs">
     <div class="tab active" onclick="searchGenre('', this)">🔥 Все</div>
@@ -227,7 +224,9 @@
     <div class="tab" onclick="searchGenre('Ambient', this)">🌌 Эмбиент</div>
   </div>
 
-  <div id="search-results" class="track-list"></div>
+  <div id="search-results" class="track-list">
+    <div class="loading">Загрузка треков...</div>
+  </div>
 </main>
 
 <div class="player-bar" id="miniPlayer" onclick="openFullPlayer()">
@@ -284,8 +283,8 @@
 <script>
   const API_KEY = '64794605';
   
-  // Хранилища плейлистов, чтобы поиск не ломал логику Next/Prev
-  let currentPlaylist = []; 
+  // Твоя единая база треков для корректного переключения Next/Prev
+  let tracks = []; 
   let currentIdx = -1;
   let isPlaying = false;
   let activeTrackId = null;
@@ -293,9 +292,8 @@
 
   window.onload = () => {
     document.body.className = localStorage.getItem('theme') || '';
-    loadPopular();
+    fetchTracks(`https://api.jamendo.com/v3.0/tracks/?client_id=${API_KEY}&format=json&limit=20&order=popularity_total`);
     
-    // Закрывать меню выбора темы при клике в любое другое место
     window.addEventListener('click', () => document.getElementById('themeMenu').classList.remove('open'));
   };
 
@@ -309,48 +307,41 @@
     localStorage.setItem('theme', t);
   }
 
-  // Загрузка топа
-  async function loadPopular() {
-    currentPlaylist = await fetchTracks(`https://api.jamendo.com/v3.0/tracks/?client_id=${API_KEY}&format=json&limit=10&order=popularity_total`, 'popular-list', true);
-  }
-
   // Поиск по жанру
   async function searchGenre(genre, tabEl) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     tabEl.classList.add('active');
     
     const url = `https://api.jamendo.com/v3.0/tracks/?client_id=${API_KEY}&format=json&limit=20&order=popularity_total` + (genre ? `&fuzzytags=${genre}` : '');
-    currentPlaylist = await fetchTracks(url, 'search-results', false);
+    fetchTracks(url);
   }
 
-  // Обычный текстовый поиск
+  // Текстовый поиск
   async function doSearch() {
     const q = document.getElementById('searchInput').value.trim();
     if(!q) return;
     const url = `https://api.jamendo.com/v3.0/tracks/?client_id=${API_KEY}&format=json&limit=20&search=${q}&order=popularity_total`;
-    currentPlaylist = await fetchTracks(url, 'search-results', false);
+    fetchTracks(url);
   }
 
-  // Общий фетчер
-  async function fetchTracks(url, targetId, isInitPopular) {
-    const el = document.getElementById(targetId);
+  // Общий рендерер списков (Твоя логика)
+  async function fetchTracks(url) {
+    const el = document.getElementById('search-results');
     el.innerHTML = '<div class="loading">Ищем классные треки...</div>';
     try {
       const res = await fetch(url);
       const data = await res.json();
-      const fetchedTracks = data.results || [];
+      tracks = data.results || [];
       
-      if(fetchedTracks.length === 0) {
+      if(tracks.length === 0) {
         el.innerHTML = '<div class="loading">Ничего не найдено 😔</div>';
-        return [];
+        return;
       }
       
-      el.innerHTML = fetchedTracks.map((t) => renderTrack(t)).join('');
-      updatePlayButtons(); // Синхронизируем иконки, если что-то уже играет
-      return fetchedTracks;
+      el.innerHTML = tracks.map((t) => renderTrack(t)).join('');
+      updatePlayButtons(); 
     } catch(e) {
       el.innerHTML = '<div class="loading">Ошибка сети при загрузке</div>';
-      return [];
     }
   }
 
@@ -392,17 +383,12 @@
 
   // --- ЛОГИКА ПЛЕЕРА ---
   window.playTrackById = function(id) {
-    // Ищем трек в текущем активном плейлисте
-    let track = currentPlaylist.find(t => t.id === id);
+    let track = tracks.find(t => t.id === id);
+    if(!track) return;
     
-    if(track) {
-      currentIdx = currentPlaylist.indexOf(track);
-    } else {
-      // Заглушка на случай, если трек из другого списка (например, кликнули по Популярным после поиска)
-      return; 
-    }
-
+    currentIdx = tracks.indexOf(track);
     activeTrackId = id;
+    
     const audio = document.getElementById('audio');
     audio.src = track.audio;
     audio.play().catch(e => console.log("Play interrupted"));
@@ -413,4 +399,16 @@
   };
 
   function updateUI(t) {
-    document.getElementById('miniName').textContent = t.name
+    document.getElementById('miniName').textContent = t.name;
+    document.getElementById('miniArt').textContent = t.artist_name;
+    document.getElementById('miniImg').src = t.image;
+    
+    document.getElementById('fullName').textContent = t.name;
+    document.getElementById('fullArt').textContent = t.artist_name;
+    document.getElementById('fullImg').src = t.image;
+    
+    document.getElementById('miniPlayer').classList.add('active');
+    
+    document.querySelectorAll('.track').forEach(el => el.classList.remove('active'));
+    const currentTrackEl = document.getElementById(`track-${t.id}`);
+    if(currentTrackEl) currentTrackEl.classList.
