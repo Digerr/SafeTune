@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#0a0a0a">
   <title>SafeTune</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300e5ff'><path d='M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z'/></svg>">
   <style>
     :root {
       --bg: #0a0a0a; --surface: #161616; --surface2: #1f1f1f;
@@ -45,21 +47,39 @@
     .track { display: flex; align-items: center; gap: 12px; background: var(--surface); padding: 10px; border-radius: var(--radius); margin-bottom: 8px; }
     .track img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; }
     .info { flex: 1; min-width: 0; }
-    .name { font-weight: 600; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .artist { color: var(--text-sec); font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .actions { display: flex; gap: 8px; align-items: center; }    
-    .btn-icon { background: var(--surface2); border: none; color: var(--text); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem; }
-    .btn-play { background: var(--accent); color: #000; }
+    .name { font-weight: 600; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }    .artist { color: var(--text-sec); font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    
+    .duration { color: var(--text-sec); font-size: 0.75rem; margin-right: 8px; font-family: monospace; }
+    
+    .actions { display: flex; gap: 8px; align-items: center; }
+    
+    /* Улучшенный дизайн кнопок */
+    .btn-icon { 
+      background: var(--surface2); border: none; color: var(--text); 
+      width: 38px; height: 38px; border-radius: 50%; 
+      display: flex; align-items: center; justify-content: center; 
+      cursor: pointer; font-size: 1rem; transition: all 0.2s; 
+    }
+    
+    /* Стильная кнопка Play */
+    .btn-play { 
+      background: var(--accent); color: #000; 
+      box-shadow: 0 0 10px var(--accent); /* Свечение */
+    }
+    .btn-play:active { transform: scale(0.9); }
+    .btn-play.playing { 
+      background: var(--text-sec); color: var(--accent); 
+      box-shadow: none; border: 2px solid var(--accent);
+    }
+    
     .btn-fav.active { color: #ff4545; }
 
     /* Mini Player Bar */
     .player-bar { 
       position: fixed; bottom: 0; left: 0; right: 0; 
       background: #181818; border-top: 1px solid #333; 
-      padding: 10px 15px; 
-      display: none; align-items: center; gap: 12px; 
-      z-index: 50; cursor: pointer; 
-      box-shadow: 0 -5px 15px rgba(0,0,0,0.5); 
+      padding: 10px 15px; display: none; align-items: center; gap: 12px; 
+      z-index: 50; cursor: pointer; box-shadow: 0 -5px 15px rgba(0,0,0,0.5); 
     }
     .player-bar.active { display: flex; }
     .p-img { width: 45px; height: 45px; border-radius: 6px; flex-shrink: 0; }
@@ -69,15 +89,14 @@
     
     .p-controls { display: flex; align-items: center; gap: 15px; }
     .p-btn { background: none; border: none; color: #fff; cursor: pointer; padding: 5px; display: flex; align-items: center; justify-content: center; }
-    .p-btn-play { background: var(--accent); color: #000; border-radius: 50%; width: 36px; height: 36px; }
+    .p-btn-play { background: var(--accent); color: #000; border-radius: 50%; width: 36px; height: 36px; box-shadow: 0 0 8px var(--accent); }
 
     /* Full Modal Player */
     .modal { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 100; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
     .modal.open { display: flex; }
     .close-modal { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--text-sec); font-size: 2rem; cursor: pointer; z-index: 101; }
     .m-cover { width: 85%; max-width: 320px; aspect-ratio: 1; border-radius: 20px; margin-bottom: 25px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); object-fit: cover; }
-    .m-title { font-size: 1.4rem; font-weight: bold; text-align: center; margin-bottom: 5px; }
-    .m-artist { color: var(--text-sec); margin-bottom: 30px; font-size: 1rem; }
+    .m-title { font-size: 1.4rem; font-weight: bold; text-align: center; margin-bottom: 5px; }    .m-artist { color: var(--text-sec); margin-bottom: 30px; font-size: 1rem; }
     
     .eq-box { display: flex; gap: 4px; height: 20px; align-items: flex-end; margin-bottom: 25px; }
     .bar { width: 4px; background: var(--accent); height: 4px; border-radius: 2px; }
@@ -89,14 +108,15 @@
 
     .modal-controls { display: flex; gap: 40px; align-items: center; margin-bottom: 30px; }
     .modal-btn { background: none; border: none; color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .modal-btn-lg { width: 70px; height: 70px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .modal-btn-lg { width: 70px; height: 70px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px var(--accent); }
 
     .progress-bar { width: 100%; max-width: 350px; display: flex; align-items: center; gap: 12px; }
     .time { font-size: 0.8rem; color: var(--text-sec); font-family: monospace; min-width: 40px; text-align: center; }
     input[type=range] { flex: 1; height: 4px; -webkit-appearance: none; background: #333; border-radius: 2px; }
     input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; background: var(--accent); border-radius: 50%; cursor: pointer; }
 
-    .loading { text-align: center; padding: 40px; color: var(--text-sec); }  </style>
+    .loading { text-align: center; padding: 40px; color: var(--text-sec); }
+  </style>
 </head>
 <body>
 
@@ -125,8 +145,7 @@
     <div class="tab" onclick="searchGenre('Electronic')">🎛️ Электро</div>
   </div>
 
-  <div class="search-box">
-    <input type="text" id="searchInput" placeholder="Поиск...">
+  <div class="search-box">    <input type="text" id="searchInput" placeholder="Поиск...">
     <button onclick="doSearch()">🔍</button>
   </div>
 
@@ -145,6 +164,7 @@
     <button class="p-btn" onclick="playNext()">⏭</button>
   </div>
 </div>
+
 <!-- Full Modal -->
 <div class="modal" id="fullPlayer">
   <button class="close-modal" onclick="closeFullPlayer()">✕</button>
@@ -174,8 +194,7 @@
   const API_KEY = '64794605';
   let tracks = [], currentIdx = -1, isPlaying = false;
   let favorites = JSON.parse(localStorage.getItem('favs') || '[]');
-  let activeTrackId = null;
-
+  let activeTrackId = null; // Храним ID играющего трека, а не только индекс
   window.onload = () => {
     const savedTheme = localStorage.getItem('theme') || '';
     document.body.className = savedTheme;
@@ -194,6 +213,7 @@
     event.target.classList.add('active');
     await fetchTracks(`https://api.jamendo.com/v3.0/tracks/?client_id=${API_KEY}&format=json&limit=20&search=${genre}&order=popularity_total`, 'search-results');
   }
+
   async function doSearch() {
     const q = document.getElementById('searchInput').value;
     if(!q) return;
@@ -213,6 +233,7 @@
 
   function renderTrack(t, i) {
     const isFav = favorites.includes(t.id);
+    const duration = formatDuration(t.duration);
     return `
       <div class="track">
         <img src="${t.image}">
@@ -222,7 +243,7 @@
         </div>
         <div class="actions">
           <button class="btn-icon btn-fav ${isFav?'active':''}" onclick="toggleFav(${t.id}, this)">♥</button>
-          <button class="btn-icon btn-play" onclick="playTrack(${i})">▶</button>
+          <button class="btn-icon btn-play" data-id="${t.id}" onclick="playTrackById(${t.id})">▶</button>          <div class="duration">${duration}</div>
           <button class="btn-icon" onclick="download('${t.audiodownload}', '${t.name.replace(/'/g,"")}')">⬇</button>
         </div>
       </div>`;
@@ -235,15 +256,16 @@
   }
 
   // --- AUDIO LOGIC ---
-  window.playTrack = function(index) {
-    if(index >= 0 && index < tracks.length) {
-      const track = tracks[index];
-      currentIdx = index;
-      activeTrackId = track.id;
+  window.playTrackById = function(id) {
+    const track = tracks.find(t => t.id === id);
+    if(track) {
+      currentIdx = tracks.indexOf(track);
+      activeTrackId = id;
       
       const audio = document.getElementById('audio');
       audio.src = track.audio;
-      audio.play().catch(e => console.error("Play error:", e));      
+      audio.play().catch(e => console.error("Play error:", e));
+      
       isPlaying = true;
       updateUI(track);
       updatePlayButtons();
@@ -269,11 +291,16 @@
     if(isPlaying) modal.classList.add('playing');
     else modal.classList.remove('playing');
     
-    // Update list buttons
-    document.querySelectorAll('.btn-play').forEach((btn, i) => {
-      // Simple logic: if playing, show pause on active track
-      // In a real app we'd match IDs, but here index is simpler for demo
-      btn.textContent = (i === currentIdx && isPlaying) ? '⏸' : '▶';
+    // Ищем кнопку с нужным ID и меняем её
+    document.querySelectorAll('.btn-play').forEach(btn => {      const btnId = btn.getAttribute('data-id');
+      if(btnId == activeTrackId) {
+        btn.innerHTML = icon;
+        if(isPlaying) btn.classList.add('playing');
+        else btn.classList.remove('playing');
+      } else {
+        btn.innerHTML = '▶';
+        btn.classList.remove('playing');
+      }
     });
   }
 
@@ -289,10 +316,15 @@
   };
 
   window.playNext = function() {
-    if(currentIdx < tracks.length - 1) playTrack(currentIdx + 1);
+    if(currentIdx < tracks.length - 1) {
+      playTrackById(tracks[currentIdx + 1].id);
+    }
   };
   
-  window.playPrev = function() {    if(currentIdx > 0) playTrack(currentIdx - 1);
+  window.playPrev = function() {
+    if(currentIdx > 0) {
+      playTrackById(tracks[currentIdx - 1].id);
+    }
   };
 
   document.getElementById('audio').onended = window.playNext;
@@ -309,10 +341,16 @@
   };
   
   seekBar.oninput = () => {
-    if(audio.duration) audio.currentTime = (seekBar.value / 100) * audio.duration;
-  };
+    if(audio.duration) audio.currentTime = (seekBar.value / 100) * audio.duration;  };
 
   function formatTime(s) {
+    const m = Math.floor(s/60);
+    const sec = Math.floor(s%60);
+    return m + ':' + (sec<10?'0':'') + sec;
+  }
+
+  function formatDuration(s) {
+    if(!s) return "0:00";
     const m = Math.floor(s/60);
     const sec = Math.floor(s%60);
     return m + ':' + (sec<10?'0':'') + sec;
