@@ -69,7 +69,8 @@
     .btn-play { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: #000; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
     .btn-fav { background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; font-size: 1.2rem; transition: 0.2s; }
     .btn-fav.active { color: var(--heart-color); transform: scale(1.1); }
-    .btn-dl { background: var(--surface2); color: var(--accent); border: 1px solid var(--border); padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; text-decoration: none; display: flex; align-items: center; gap: 4px; }
+    .btn-dl { background: var(--surface2); color: var(--accent); border: 1px solid var(--border); padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; text-decoration: none; display: flex; align-items: center; gap: 4px; cursor: pointer; }
+    .btn-dl.loading { opacity: 0.6; pointer-events: none; }
     
     /* Mini Player */
     #player-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); padding: 12px 16px; display: none; align-items: center; gap: 12px; z-index: 300; cursor: pointer; }
@@ -95,8 +96,8 @@
 
     /* Equalizer Animation */
     .equalizer {
-      display: flex;
-      justify-content: center;      align-items: flex-end;
+      display: flex;      justify-content: center;
+      align-items: flex-end;
       height: 24px;
       width: 30px;
       gap: 3px;
@@ -144,8 +145,8 @@
     
     input[type="range"] {
       -webkit-appearance: none;
-      width: 100%;
-      height: 4px;      background: var(--border);
+      width: 100%;      height: 4px;
+      background: var(--border);
       border-radius: 2px;
       outline: none;
     }
@@ -193,8 +194,8 @@
   <div class="tabs-container">
     <div class="genre-tabs" id="tabs">
       <div class="tab tab-fav active" data-type="fav">❤️ Избранное</div>
-      <div class="tab" data-genre="Rock">🎸 Рок</div>
-      <div class="tab" data-genre="Pop">🎤 Поп</div>      <div class="tab" data-genre="Lo-Fi">☕ Ло-фай</div>
+      <div class="tab" data-genre="Rock">🎸 Рок</div>      <div class="tab" data-genre="Pop">🎤 Поп</div>
+      <div class="tab" data-genre="Lo-Fi">☕ Ло-фай</div>
       <div class="tab" data-genre="Electronic">🎛️ Электро</div>
       <div class="tab" data-genre="Hip-Hop">🎤 Хип-хоп</div>
     </div>
@@ -242,8 +243,8 @@
 
     <div class="modal-track-info">
       <div class="modal-name" id="modal-name">—</div>
-      <div class="modal-artist" id="modal-artist">—</div>
-    </div>    
+      <div class="modal-artist" id="modal-artist">—</div>    </div>
+    
     <div class="modal-controls">
       <button onclick="playPrev()">⏮</button>
       <button class="btn-play-lg" onclick="togglePlay()" id="play-btn-lg">▶</button>
@@ -291,8 +292,8 @@
     tabs: document.getElementById('tabs'),
     themeBtn: document.getElementById('theme-btn'),
     themeMenu: document.getElementById('theme-menu'),
-    playerModal: document.getElementById('player-modal'),
-    seekBar: document.getElementById('seek-bar'),    currentTimeEl: document.getElementById('current-time'),
+    playerModal: document.getElementById('player-modal'),    seekBar: document.getElementById('seek-bar'),
+    currentTimeEl: document.getElementById('current-time'),
     totalTimeEl: document.getElementById('total-time')
   };
 
@@ -340,8 +341,8 @@
   }
 
   async function search(query) {
-    if(!query) return;
-    els.list.innerHTML = '';    els.empty.classList.add('hidden');
+    if(!query) return;    els.list.innerHTML = '';
+    els.empty.classList.add('hidden');
     els.loading.classList.remove('hidden');
 
     const url = `https://api.jamendo.com/v3.0/tracks/?client_id=${API_KEY}&format=json&limit=${els.limit.value}&imagesize=300&order=${els.sort.value}&search=${encodeURIComponent(query)}`;
@@ -363,6 +364,7 @@
     div.className = 'track-item';
     const playFn = isPopular ? `playFromPopular(${i})` : `play(${i})`;
     
+    // Кнопка скачивания теперь вызывает JS функцию
     div.innerHTML = `
       <img class="track-art" src="${t.image}" loading="lazy">
       <div class="track-info">
@@ -372,46 +374,42 @@
       <div class="track-actions">
         <button class="btn-fav ${isFav?'active':''}" onclick="toggleFav(${t.id}, this)">♥</button>
         <button class="btn-play" onclick="${playFn}">▶</button>
-        <a href="${t.audiodownload}" class="btn-dl" download>⬇</a>
+        <button class="btn-dl" onclick="forceDownload('${t.audiodownload}', '${t.name}.mp3', this)">⬇️</button>
       </div>
     `;
     (isPopular ? els.popularList : els.list).appendChild(div);
   }
 
-  function renderFavorites() {
-    els.loading.classList.remove('hidden');
-    els.empty.classList.add('hidden');
-    els.list.innerHTML = '';
-    const favTracks = tracks.filter(t => favorites.includes(t.id));
-    els.loading.classList.add('hidden');
-    if(favTracks.length === 0) {
-      els.empty.textContent = 'Пока нет избранных треков';
-      els.empty.classList.remove('hidden');
-      return;
-    }
-    favTracks.forEach((t, i) => createTrackElement(t, i, false));
-  }
-  window.toggleFav = function(id, btn) {
-    if(favorites.includes(id)) favorites = favorites.filter(x => x !== id);
-    else favorites.push(id);
-    localStorage.setItem('safetune_favs', JSON.stringify(favorites));
-    btn.classList.toggle('active');
-    if(document.querySelector('.tab-fav.active')) renderFavorites();
-  };
-
-  // --- PLAYER ---
-  window.playFromPopular = (i) => playTrack(popularTracks[i]);
-  window.play = (i) => playTrack(tracks[i]);
-
-  function playTrack(t) {
-    if(!t) return;
-    els.audio.src = t.audio;
-    els.audio.play();
-    updateUI(t, true);
-  }
-
-  function updateUI(t, isPlaying) {
-    els.miniName.textContent = t.name;
-    els.miniArtist.textContent = t.artist_name;
-    els.miniCover.src = t.image;
-    els.modalName.textConte
+  // --- DOWNLOAD LOGIC ---
+  window.forceDownload = async function(url, filename, btnElement) {
+    if(!url) { alert('Ссылка для скачивания недоступна'); return; }
+    
+    const originalText = btnElement.innerHTML;
+    btnElement.innerHTML = '⏳';
+    btnElement.classList.add('loading');
+    
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();      const blobUrl = window.URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = blobUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      
+      window.URL.revokeObjectURL(blobUrl);
+      document.body.removeChild(a);
+      
+      btnElement.innerHTML = '✅';
+      setTimeout(() => {
+        btnElement.innerHTML = originalText;
+        btnElement.classList.remove('loading');
+      }, 2000);
+    } catch (e) {
+      console.error('Download failed', e);
+      btnElement.innerHTML = '❌';
+      setTimeout(() => {
+        btnElement.innerHTML = originalText;
+        
