@@ -1,415 +1,156 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#0a0a0a">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SafeTune</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300e5ff'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg: #0a0a0a; --surface: #111111; --surface2: #1a1a1a; --border: #222222;
-      --accent: #00e5ff; --accent-dim: rgba(0, 229, 255, 0.12);
-      --text: #f0f0f0; --text-muted: #666666; --text-sub: #999999;
-      --danger: #ff4545; --success: #00c853; --heart-color: #ff4545;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      background: #0a0a0a; 
+      color: #fff; 
+      font-family: Arial, sans-serif; 
+      padding: 20px;
     }
-    body.theme-sunset { --accent: #ff7b00; --accent-dim: rgba(255, 123, 0, 0.15); --heart-color: #ff4500; }
-    body.theme-matrix { --accent: #00ff41; --accent-dim: rgba(0, 255, 65, 0.15); --heart-color: #00ff41; --bg: #050505; }
-    
-    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
-    
-    header { display: flex; align-items: center; justify-content: space-between; padding: 18px 16px; border-bottom: 1px solid var(--border); background: var(--surface); position: sticky; top: 0; z-index: 100; }
-    .logo { display: flex; align-items: center; gap: 10px; font-size: 1.25rem; font-weight: 700; }
-    .logo svg { color: var(--accent); width: 24px; }
-    .theme-btn { background: var(--surface2); color: var(--text-sub); border: 1px solid var(--border); padding: 6px 10px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; }
-    
-    .theme-menu { display: none; position: absolute; top: 60px; right: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 8px; z-index: 200; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-    .theme-menu.open { display: block; }
-    .theme-option { padding: 8px 12px; cursor: pointer; border-radius: 6px; display: flex; align-items: center; gap: 8px; }
-    .theme-option:hover { background: var(--surface2); }
-    .dot { width: 12px; height: 12px; border-radius: 50%; }
-
-    main { flex: 1; padding: 20px 16px 100px 16px; max-width: 800px; margin: 0 auto; width: 100%; }
-    .hero { text-align: center; margin-bottom: 24px; }
-    .hero h1 { font-size: 1.8rem; font-weight: 800; }
-    .hero h1 span { color: var(--accent); }
-    .hero p { color: var(--text-sub); font-size: 0.9rem; margin-top: 4px; }
-
-    .section-title { font-size: 1.1rem; font-weight: 700; margin: 24px 0 16px 0; color: var(--text); display: flex; align-items: center; gap: 8px; }
-    .section-title::before { content: ''; width: 4px; height: 20px; background: var(--accent); border-radius: 2px; }
-
-    .tabs-container { margin-bottom: 20px; }
-    .genre-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-    .genre-tabs::-webkit-scrollbar { display: none; }
-    .tab { background: var(--surface2); color: var(--text-sub); padding: 8px 16px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; border: 1px solid transparent; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; }
-    .tab.active { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
-    .tab-fav { border-color: var(--border); color: var(--text); }    .tab-fav.active { color: var(--heart-color); border-color: var(--heart-color); background: rgba(255, 69, 69, 0.1); }
-
-    .controls { display: flex; gap: 8px; margin-bottom: 16px; }
-    .search-wrap { flex: 1; position: relative; }
-    .search-wrap input { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; color: var(--text); padding: 12px 14px 12px 40px; outline: none; }
-    .search-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
-    .btn-search { background: var(--accent); color: #000; border: none; border-radius: 10px; padding: 0 20px; font-weight: 600; cursor: pointer; }
-    
-    .filter-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 20px; }
-    .filter-row select { background: var(--surface); color: var(--text-sub); border: 1px solid var(--border); padding: 8px; border-radius: 8px; font-size: 0.85rem; }
-
-    .track-item { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; animation: slideIn 0.3s ease; }
-    @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .track-art { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; background: var(--surface2); flex-shrink: 0; }
-    .track-info { flex: 1; min-width: 0; }
-    .track-name { font-weight: 600; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .track-artist { color: var(--text-sub); font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .track-actions { display: flex; align-items: center; gap: 8px; }
-    
-    .btn-play { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: #000; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-    .btn-fav { background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; font-size: 1.2rem; transition: 0.2s; }
-    .btn-fav.active { color: var(--heart-color); transform: scale(1.1); }
-    .btn-dl { background: var(--surface2); color: var(--accent); border: 1px solid var(--border); padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; text-decoration: none; display: flex; align-items: center; gap: 4px; cursor: pointer; }
-    .btn-dl.loading { opacity: 0.6; pointer-events: none; }
-    
-    /* Mini Player */
-    #player-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); padding: 12px 16px; display: none; align-items: center; gap: 12px; z-index: 300; cursor: pointer; }
-    #player-bar.visible { display: flex; }
-    .player-cover { width: 40px; height: 40px; border-radius: 6px; }
-    .player-info { flex: 1; }
-    .player-name { font-size: 0.9rem; font-weight: 600; }
-    .player-artist { font-size: 0.8rem; color: var(--text-sub); }
-    .player-controls button { background: transparent; border: none; color: var(--text); font-size: 1.5rem; cursor: pointer; padding: 0 4px; }
-
-    /* Full Modal Player */
-    #player-modal { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 400; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
-    #player-modal.open { display: flex; }
-    .modal-close { position: absolute; top: 20px; right: 20px; background: transparent; border: none; color: var(--text-sub); font-size: 1.5rem; cursor: pointer; }
-    
-    .modal-content { text-align: center; width: 100%; max-width: 400px; display: flex; flex-direction: column; align-items: center; }
-    
-    .modal-cover { width: 100%; max-width: 300px; aspect-ratio: 1; border-radius: 20px; object-fit: cover; margin-bottom: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-    
-    .modal-track-info { margin-bottom: 20px; width: 100%; }
-    .modal-name { font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .modal-artist { color: var(--text-sub); font-size: 1rem; text-align: center; }
-
-    /* Equalizer Animation */
-    .equalizer {
-      display: flex;      justify-content: center;
-      align-items: flex-end;
-      height: 24px;
-      width: 30px;
-      gap: 3px;
-      margin-bottom: 15px;
+    .header { text-align: center; margin-bottom: 30px; }
+    .header h1 { color: #00e5ff; font-size: 2.5rem; }
+    .section { margin-bottom: 30px; }
+    .section-title { 
+      font-size: 1.3rem; 
+      margin-bottom: 15px; 
+      color: #00e5ff;
+      border-left: 3px solid #00e5ff;
+      padding-left: 10px;
     }
-    .bar {
-      width: 4px;
-      background: var(--accent);
-      border-radius: 2px;
-      animation: none;
-      height: 5px;
+    .track { 
+      background: #1a1a1a; 
+      padding: 12px; 
+      margin-bottom: 10px; 
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
-    #player-modal.playing .bar {
-      animation: equalize 1s infinite ease-in-out;
-    }
-    .bar:nth-child(1) { animation-delay: 0.1s; }
-    .bar:nth-child(2) { animation-delay: 0.3s; }
-    .bar:nth-child(3) { animation-delay: 0.5s; }
-    .bar:nth-child(4) { animation-delay: 0.2s; }
-    .bar:nth-child(5) { animation-delay: 0.4s; }
-
-    @keyframes equalize {
-      0%, 100% { height: 5px; }
-      50% { height: 20px; }
-    }
-
-    /* Controls & Progress */
-    .modal-controls { display: flex; align-items: center; gap: 24px; margin-bottom: 25px; }
-    .modal-controls button { background: none; border: none; color: var(--text); font-size: 2rem; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-    .modal-controls button:hover { color: var(--accent); }
-    
-    .btn-play-lg { 
-      width: 64px; height: 64px; 
-      background: var(--accent); 
-      color: #000; 
-      border-radius: 50%; 
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 0 20px var(--accent-dim);
-    }
-
-    /* Progress Bar */
-    .progress-container { width: 100%; padding: 0 10px; display: flex; align-items: center; gap: 10px; }
-    .time-display { font-size: 0.8rem; color: var(--text-sub); font-variant-numeric: tabular-nums; min-width: 35px; }
-    .time-display.right { text-align: right; }
-    
-    input[type="range"] {
-      -webkit-appearance: none;
-      width: 100%;      height: 4px;
-      background: var(--border);
-      border-radius: 2px;
-      outline: none;
-    }
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 12px;
-      height: 12px;
-      background: var(--accent);
-      border-radius: 50%;
+    .track img { width: 50px; height: 50px; border-radius: 5px; }
+    .track-info { flex: 1; }
+    .track-name { font-weight: bold; margin-bottom: 3px; }
+    .track-artist { color: #999; font-size: 0.9rem; }
+    .btn {
+      background: #00e5ff;
+      color: #000;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 5px;
       cursor: pointer;
+      font-weight: bold;
     }
-
-    .state { text-align: center; padding: 40px; color: var(--text-muted); }
-    .spinner { width: 30px; height: 30px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 10px; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .hidden { display: none !important; }
+    .error { 
+      background: #300; 
+      color: #f66; 
+      padding: 15px;       border-radius: 8px; 
+      margin: 20px 0;
+      border: 1px solid #f66;
+    }
+    .loading { text-align: center; padding: 40px; color: #666; }
+    #debug { 
+      background: #222; 
+      color: #0f0; 
+      padding: 10px; 
+      margin-bottom: 20px; 
+      border-radius: 5px;
+      font-family: monospace;
+      font-size: 12px;
+    }
   </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
-    SafeTune
-  </div>
-  <button class="theme-btn" id="theme-btn">🎨 Тема</button>
-  
-  <div class="theme-menu" id="theme-menu">
-    <div class="theme-option" data-theme="default"><span class="dot" style="background:#00e5ff"></span> Синяя</div>
-    <div class="theme-option" data-theme="sunset"><span class="dot" style="background:#ff7b00"></span> Оранжевая</div>
-    <div class="theme-option" data-theme="matrix"><span class="dot" style="background:#00ff41"></span> Матрица</div>
-  </div>
-</header>
+<div id="debug">🔧 Инициализация...</div>
 
-<main>
-  <div class="hero">
-    <h1>Safe<span>Tune</span></h1>
-    <p>Безопасная музыка для контента</p>
-  </div>
+<div class="header">
+  <h1>🎵 SafeTune</h1>
+  <p style="color: #999; margin-top: 10px;">Безопасная музыка для контента</p>
+</div>
 
+<div id="error-container"></div>
+
+<div class="section">
   <div class="section-title">🔥 Популярное сейчас</div>
-  <div id="popular-list"></div>
-
-  <div class="section-title">🎵 Жанры</div>
-  <div class="tabs-container">
-    <div class="genre-tabs" id="tabs">
-      <div class="tab tab-fav active" data-type="fav">❤️ Избранное</div>
-      <div class="tab" data-genre="Rock">🎸 Рок</div>      <div class="tab" data-genre="Pop">🎤 Поп</div>
-      <div class="tab" data-genre="Lo-Fi">☕ Ло-фай</div>
-      <div class="tab" data-genre="Electronic">🎛️ Электро</div>
-      <div class="tab" data-genre="Hip-Hop">🎤 Хип-хоп</div>
-    </div>
-  </div>
-
-  <div class="controls">
-    <div class="search-wrap">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" id="search-input" placeholder="Поиск...">
-    </div>
-    <button class="btn-search" id="search-btn">🔍</button>
-  </div>
-
-  <div class="filter-row">
-    <select id="sort-select"><option value="popularity_total">Популярное</option><option value="releasedate">Новое</option></select>
-    <select id="limit-select"><option value="20">20 треков</option><option value="50">50 треков</option></select>
-  </div>
-
-  <div id="loading" class="state hidden"><div class="spinner"></div>Загрузка...</div>
-  <div id="empty" class="state hidden">Ничего не найдено</div>
-  <div id="list"></div>
-</main>
-
-<div id="player-bar" onclick="openModal()">
-  <img id="mini-cover" class="player-cover" src="" />
-  <div class="player-info">
-    <div class="player-name" id="mini-name">—</div>
-    <div class="player-artist" id="mini-artist">—</div>
-  </div>
-  <div class="player-controls">
-    <button onclick="event.stopPropagation(); togglePlay()">⏯</button>
-    <button onclick="event.stopPropagation(); playNext()">⏭</button>
+  <div id="popular-list">
+    <div class="loading">Загрузка треков...</div>
   </div>
 </div>
-
-<div id="player-modal">
-  <button class="modal-close" onclick="closeModal()">✕</button>
-  <div class="modal-content">
-    <img id="modal-cover" class="modal-cover" src="" />
-    
-    <!-- Equalizer -->
-    <div class="equalizer">
-      <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
-    </div>
-
-    <div class="modal-track-info">
-      <div class="modal-name" id="modal-name">—</div>
-      <div class="modal-artist" id="modal-artist">—</div>    </div>
-    
-    <div class="modal-controls">
-      <button onclick="playPrev()">⏮</button>
-      <button class="btn-play-lg" onclick="togglePlay()" id="play-btn-lg">▶</button>
-      <button onclick="playNext()">⏭</button>
-    </div>
-
-    <!-- Progress Bar & Time -->
-    <div class="progress-container">
-      <span class="time-display" id="current-time">0:00</span>
-      <input type="range" id="seek-bar" value="0" min="0" max="100">
-      <span class="time-display right" id="total-time">0:00</span>
-    </div>
-  </div>
-</div>
-
-<audio id="audio"></audio>
 
 <script>
-  const API_KEY = '64794605'; 
-  let tracks = [];
-  let popularTracks = [];
-  let favorites = [];
-  try { favorites = JSON.parse(localStorage.getItem('safetune_favs') || '[]'); } catch(e) { favorites = []; }
-  
-  let currentIdx = -1;
+const debug = document.getElementById('debug');
+const API_KEY = '64794605';
 
-  const els = {
-    input: document.getElementById('search-input'),
-    btn: document.getElementById('search-btn'),
-    sort: document.getElementById('sort-select'),
-    limit: document.getElementById('limit-select'),
-    list: document.getElementById('list'),
-    popularList: document.getElementById('popular-list'),
-    loading: document.getElementById('loading'),
-    empty: document.getElementById('empty'),
-    player: document.getElementById('player-bar'),
-    miniName: document.getElementById('mini-name'),
-    miniArtist: document.getElementById('mini-artist'),
-    miniCover: document.getElementById('mini-cover'),
-    modalName: document.getElementById('modal-name'),
-    modalArtist: document.getElementById('modal-artist'),
-    modalCover: document.getElementById('modal-cover'),
-    playBtnLg: document.getElementById('play-btn-lg'),
-    audio: document.getElementById('audio'),
-    tabs: document.getElementById('tabs'),
-    themeBtn: document.getElementById('theme-btn'),
-    themeMenu: document.getElementById('theme-menu'),
-    playerModal: document.getElementById('player-modal'),    seekBar: document.getElementById('seek-bar'),
-    currentTimeEl: document.getElementById('current-time'),
-    totalTimeEl: document.getElementById('total-time')
-  };
+function log(msg) {
+  debug.textContent = '✅ ' + msg;
+  console.log(msg);
+}
 
-  // --- INIT ---
-  const savedTheme = localStorage.getItem('safetune_theme') || 'default';
-  applyTheme(savedTheme);
-  loadPopularTracks();
+function showError(msg) {
+  document.getElementById('error-container').innerHTML = 
+    `<div class="error">❌ Ошибка: ${msg}<br><small>Проверь консоль (F12)</small></div>`;
+}
 
-  els.btn.onclick = () => search(els.input.value);
-  els.input.onkeypress = (e) => { if(e.key === 'Enter') search(els.input.value); };
-  
-  els.themeBtn.onclick = (e) => { e.stopPropagation(); els.themeMenu.classList.toggle('open'); };
-  document.querySelectorAll('.theme-option').forEach(opt => {
-    opt.onclick = () => { applyTheme(opt.dataset.theme); els.themeMenu.classList.remove('open'); };
-  });
-  document.body.onclick = () => els.themeMenu.classList.remove('open');
-
-  els.tabs.onclick = (e) => {
-    const tab = e.target.closest('.tab');
-    if(!tab) return;
-    e.stopPropagation();
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    if(tab.dataset.type === 'fav') renderFavorites();
-    else if(tab.dataset.genre) search(tab.dataset.genre);
-  };
-
-  // --- API ---
-  async function loadPopularTracks() {
-    els.loading.classList.remove('hidden');
-    const url = `https://api.jamendo.com/v3.0/tracks/?client_id=${API_KEY}&format=json&limit=5&imagesize=300&order=popularity_total`;
-    try {
-      const res = await fetch(url);
-      const data = await res.json();
-      popularTracks = data.results || [];
-      renderPopularTracks();
-    } catch(e) { console.error(e); }
-    finally { els.loading.classList.add('hidden'); }
-  }
-
-  function renderPopularTracks() {
-    if(!els.popularList) return;
-    els.popularList.innerHTML = '';
-    popularTracks.slice(0, 5).forEach((t, i) => createTrackElement(t, i, true));
-  }
-
-  async function search(query) {
-    if(!query) return;    els.list.innerHTML = '';
-    els.empty.classList.add('hidden');
-    els.loading.classList.remove('hidden');
-
-    const url = `https://api.jamendo.com/v3.0/tracks/?client_id=${API_KEY}&format=json&limit=${els.limit.value}&imagesize=300&order=${els.sort.value}&search=${encodeURIComponent(query)}`;
-    try {
-      const res = await fetch(url);
-      const data = await res.json();
-      tracks = data.results || [];
-      tracks.forEach((t, i) => createTrackElement(t, i, false));
-    } catch(e) { console.error(e); }
-    finally {
-      els.loading.classList.add('hidden');
-      if(tracks.length === 0) els.empty.classList.remove('hidden');
+async function loadTracks() {
+  try {    log('Подключение к API...');
+    const url = `https://api.jamendo.com/v3.0/tracks/?client_id=${API_KEY}&format=json&limit=10&imagesize=200&order=popularity_total`;
+    
+    log('Запрос: ' + url);
+    const response = await fetch(url);
+    log('Статус: ' + response.status);
+    
+    if (!response.ok) {
+      throw new Error('HTTP ' + response.status);
     }
+    
+    const data = await response.json();
+    log('Получено треков: ' + (data.results ? data.results.length : 0));
+    
+    if (!data.results || data.results.length === 0) {
+      throw new Error('API вернул пустой список');
+    }
+    
+    renderTracks(data.results);
+    log('Успех! Треки отображены');
+    
+  } catch (error) {
+    log('Ошибка: ' + error.message);
+    showError(error.message + '<br><br>Возможные причины:<br>' +
+              '1. API ключ не работает<br>' +
+              '2. Нет интернета<br>' +
+              '3. Jamendo API недоступен');
   }
+}
 
-  function createTrackElement(t, i, isPopular) {
-    const isFav = favorites.includes(t.id);
+function renderTracks(tracks) {
+  const container = document.getElementById('popular-list');
+  container.innerHTML = '';
+  
+  tracks.forEach((track, i) => {
     const div = document.createElement('div');
-    div.className = 'track-item';
-    const playFn = isPopular ? `playFromPopular(${i})` : `play(${i})`;
-    
-    // Кнопка скачивания теперь вызывает JS функцию
+    div.className = 'track';
     div.innerHTML = `
-      <img class="track-art" src="${t.image}" loading="lazy">
+      <img src="${track.image}" alt="">
       <div class="track-info">
-        <div class="track-name">${t.name}</div>
-        <div class="track-artist">${t.artist_name}</div>
+        <div class="track-name">${track.name}</div>
+        <div class="track-artist">${track.artist_name}</div>
       </div>
-      <div class="track-actions">
-        <button class="btn-fav ${isFav?'active':''}" onclick="toggleFav(${t.id}, this)">♥</button>
-        <button class="btn-play" onclick="${playFn}">▶</button>
-        <button class="btn-dl" onclick="forceDownload('${t.audiodownload}', '${t.name}.mp3', this)">⬇️</button>
-      </div>
+      <button class="btn" onclick="alert('Play: ${track.name}')">▶</button>
     `;
-    (isPopular ? els.popularList : els.list).appendChild(div);
-  }
+    container.appendChild(div);
+  });
+}
 
-  // --- DOWNLOAD LOGIC ---
-  window.forceDownload = async function(url, filename, btnElement) {
-    if(!url) { alert('Ссылка для скачивания недоступна'); return; }
-    
-    const originalText = btnElement.innerHTML;
-    btnElement.innerHTML = '⏳';
-    btnElement.classList.add('loading');
-    
-    try {
-      const response = await fetch(url);
-      const blob = await response.blob();      const blobUrl = window.URL.createObjectURL(blob);
-      
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = blobUrl;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      
-      window.URL.revokeObjectURL(blobUrl);
-      document.body.removeChild(a);
-      
-      btnElement.innerHTML = '✅';
-      setTimeout(() => {
-        btnElement.innerHTML = originalText;
-        btnElement.classList.remove('loading');
-      }, 2000);
-    } catch (e) {
-      console.error('Download failed', e);
-      btnElement.innerHTML = '❌';
-      setTimeout(() => {
-        btnElement.innerHTML = originalText;
-        
+// Запуск при загрузкеlog('Страница загружена');
+window.addEventListener('DOMContentLoaded', () => {
+  log('DOM готов');
+  loadTracks();
+});
+</script>
+
+</body>
+</html>
