@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#0a0a0a">
   <title>SafeTune</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300e5ff'><path d='M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z'/></svg>">
   <style>
     :root {
       --bg: #0a0a0a; --surface: #161616; --surface2: #1f1f1f;
@@ -26,7 +24,6 @@
     .theme-menu { display: none; position: absolute; top: 60px; right: 20px; background: var(--surface2); border-radius: 10px; padding: 10px; border: 1px solid #333; z-index: 20; }
     .theme-menu.open { display: block; }
     .theme-opt { padding: 10px 15px; cursor: pointer; border-radius: 5px; }
-    .theme-opt:hover { background: #333; }
 
     main { padding: 20px; max-width: 800px; margin: 0 auto; }
     h1 { text-align: center; margin-bottom: 5px; font-size: 2rem; }
@@ -35,35 +32,35 @@
 
     .section-title { font-size: 1.1rem; font-weight: bold; margin: 20px 0 10px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
     
-    /* Tabs */
     .tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; margin-bottom: 15px; }
     .tabs::-webkit-scrollbar { display: none; }
     .tab { background: var(--surface2); padding: 8px 16px; border-radius: 20px; white-space: nowrap; color: var(--text-sec); cursor: pointer; font-size: 0.9rem; border: 1px solid transparent; }
     .tab.active { background: var(--accent); color: #000; font-weight: bold; }
 
-    /* Search */
     .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
     .search-box input { flex: 1; background: var(--surface2); border: 1px solid #333; padding: 12px; border-radius: var(--radius); color: #fff; font-size: 1rem; outline: none; }
     .search-box button { background: var(--accent); color: #000; border: none; padding: 0 20px; border-radius: var(--radius); font-weight: bold; cursor: pointer; font-size: 1.2rem; }
 
     /* Track List */
-    .track { display: flex; align-items: center; gap: 12px; background: var(--surface); padding: 10px; border-radius: var(--radius); margin-bottom: 8px; }    .track img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; }
+    .track { display: flex; align-items: center; gap: 12px; background: var(--surface); padding: 10px; border-radius: var(--radius); margin-bottom: 8px; }
+    .track img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; }
     .info { flex: 1; min-width: 0; }
     .name { font-weight: 600; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .artist { color: var(--text-sec); font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .actions { display: flex; gap: 8px; align-items: center; }
-    
-    .btn-icon { background: var(--surface2); border: none; color: var(--text); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem; transition: 0.2s; }
-    .btn-icon:active { transform: scale(0.9); }
-    
+    .actions { display: flex; gap: 8px; align-items: center; }    
+    .btn-icon { background: var(--surface2); border: none; color: var(--text); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem; }
     .btn-play { background: var(--accent); color: #000; }
-    .btn-play.playing { background: var(--text-sec); color: var(--accent); border: 2px solid var(--accent); }
-    
-    .btn-fav { background: none; color: var(--text-sec); }
     .btn-fav.active { color: #ff4545; }
 
     /* Mini Player Bar */
-    .player-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #181818; border-top: 1px solid #333; padding: 10px 15px; display: none; align-items: center; gap: 12px; z-index: 50; cursor: pointer; box-shadow: 0 -5px 15px rgba(0,0,0,0.5); }
+    .player-bar { 
+      position: fixed; bottom: 0; left: 0; right: 0; 
+      background: #181818; border-top: 1px solid #333; 
+      padding: 10px 15px; 
+      display: none; align-items: center; gap: 12px; 
+      z-index: 50; cursor: pointer; 
+      box-shadow: 0 -5px 15px rgba(0,0,0,0.5); 
+    }
     .player-bar.active { display: flex; }
     .p-img { width: 45px; height: 45px; border-radius: 6px; flex-shrink: 0; }
     .p-info { flex: 1; min-width: 0; }
@@ -72,16 +69,14 @@
     
     .p-controls { display: flex; align-items: center; gap: 15px; }
     .p-btn { background: none; border: none; color: #fff; cursor: pointer; padding: 5px; display: flex; align-items: center; justify-content: center; }
-    .p-btn svg { width: 24px; height: 24px; fill: currentColor; }
     .p-btn-play { background: var(--accent); color: #000; border-radius: 50%; width: 36px; height: 36px; }
-    .p-btn-play svg { width: 18px; height: 18px; fill: #000; }
 
     /* Full Modal Player */
     .modal { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 100; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
     .modal.open { display: flex; }
     .close-modal { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--text-sec); font-size: 2rem; cursor: pointer; z-index: 101; }
     .m-cover { width: 85%; max-width: 320px; aspect-ratio: 1; border-radius: 20px; margin-bottom: 25px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); object-fit: cover; }
-    .m-title { font-size: 1.4rem; font-weight: bold; text-align: center; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+    .m-title { font-size: 1.4rem; font-weight: bold; text-align: center; margin-bottom: 5px; }
     .m-artist { color: var(--text-sec); margin-bottom: 30px; font-size: 1rem; }
     
     .eq-box { display: flex; gap: 4px; height: 20px; align-items: flex-end; margin-bottom: 25px; }
@@ -90,22 +85,18 @@
     .bar:nth-child(1) { animation-delay: 0s; }
     .bar:nth-child(2) { animation-delay: 0.2s; }
     .bar:nth-child(3) { animation-delay: 0.4s; }
-    .bar:nth-child(4) { animation-delay: 0.1s; }
-    .bar:nth-child(5) { animation-delay: 0.3s; }
     @keyframes bounce { 0% { height: 4px; } 100% { height: 20px; } }
 
     .modal-controls { display: flex; gap: 40px; align-items: center; margin-bottom: 30px; }
     .modal-btn { background: none; border: none; color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .modal-btn svg { width: 32px; height: 32px; fill: currentColor; }    .modal-btn-lg { width: 70px; height: 70px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-    .modal-btn-lg svg { width: 30px; height: 30px; fill: #000; }
+    .modal-btn-lg { width: 70px; height: 70px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 
     .progress-bar { width: 100%; max-width: 350px; display: flex; align-items: center; gap: 12px; }
     .time { font-size: 0.8rem; color: var(--text-sec); font-family: monospace; min-width: 40px; text-align: center; }
     input[type=range] { flex: 1; height: 4px; -webkit-appearance: none; background: #333; border-radius: 2px; }
     input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; background: var(--accent); border-radius: 50%; cursor: pointer; }
 
-    .loading { text-align: center; padding: 40px; color: var(--text-sec); }
-  </style>
+    .loading { text-align: center; padding: 40px; color: var(--text-sec); }  </style>
 </head>
 <body>
 
@@ -132,7 +123,6 @@
     <div class="tab" onclick="searchGenre('Rock')">🎸 Рок</div>
     <div class="tab" onclick="searchGenre('Pop')">🎤 Поп</div>
     <div class="tab" onclick="searchGenre('Electronic')">🎛️ Электро</div>
-    <div class="tab" onclick="searchGenre('Lo-Fi')">☕ Ло-фай</div>
   </div>
 
   <div class="search-box">
@@ -145,20 +135,16 @@
 
 <!-- Mini Player -->
 <div class="player-bar" id="miniPlayer" onclick="openFullPlayer()">
-  <img id="miniImg" class="p-img" src="">  <div class="p-info">
+  <img id="miniImg" class="p-img" src="">
+  <div class="p-info">
     <div class="p-name" id="miniName">—</div>
     <div class="p-art" id="miniArt">—</div>
   </div>
   <div class="p-controls" onclick="event.stopPropagation()">
-    <button class="p-btn p-btn-play" id="miniPlayBtn">
-      <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-    </button>
-    <button class="p-btn" onclick="playNext()">
-      <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zm2-6 6.5 4.5v-9L8 12zm8-6h2v12h-2z"/></svg>
-    </button>
+    <button class="p-btn p-btn-play" id="miniPlayBtn">▶</button>
+    <button class="p-btn" onclick="playNext()">⏭</button>
   </div>
 </div>
-
 <!-- Full Modal -->
 <div class="modal" id="fullPlayer">
   <button class="close-modal" onclick="closeFullPlayer()">✕</button>
@@ -170,15 +156,9 @@
   <div class="m-artist" id="fullArt">—</div>
   
   <div class="modal-controls">
-    <button class="modal-btn" onclick="playPrev()">
-      <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
-    </button>
-    <button class="modal-btn modal-btn-lg" onclick="togglePlay()" id="fullPlayBtn">
-      <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-    </button>
-    <button class="modal-btn" onclick="playNext()">
-      <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zm2-6 6.5 4.5v-9L8 12zm8-6h2v12h-2z"/></svg>
-    </button>
+    <button class="modal-btn" onclick="playPrev()">⏮</button>
+    <button class="modal-btn modal-btn-lg" onclick="togglePlay()" id="fullPlayBtn">▶</button>
+    <button class="modal-btn" onclick="playNext()">⏭</button>
   </div>
 
   <div class="progress-bar">
@@ -194,12 +174,8 @@
   const API_KEY = '64794605';
   let tracks = [], currentIdx = -1, isPlaying = false;
   let favorites = JSON.parse(localStorage.getItem('favs') || '[]');
-  let activeTrackId = null; // ID текущего играющего трека
-  // SVG Icons
-  const ICON_PLAY = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
-  const ICON_PAUSE = '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+  let activeTrackId = null;
 
-  // Init
   window.onload = () => {
     const savedTheme = localStorage.getItem('theme') || '';
     document.body.className = savedTheme;
@@ -210,7 +186,7 @@
   function setTheme(t) { document.body.className = t; localStorage.setItem('theme', t); toggleMenu(); }
 
   async function loadPopular() {
-    await fetchTracks(`https://api.jamendo.com/v3.0/tracks/?client_id=${API_KEY}&format=json&limit=10&order=popularity_total`, 'popular-list', true);
+    await fetchTracks(`https://api.jamendo.com/v3.0/tracks/?client_id=${API_KEY}&format=json&limit=10&order=popularity_total`, 'popular-list');
   }
 
   async function searchGenre(genre) {
@@ -218,32 +194,25 @@
     event.target.classList.add('active');
     await fetchTracks(`https://api.jamendo.com/v3.0/tracks/?client_id=${API_KEY}&format=json&limit=20&search=${genre}&order=popularity_total`, 'search-results');
   }
-
   async function doSearch() {
     const q = document.getElementById('searchInput').value;
     if(!q) return;
     await fetchTracks(`https://api.jamendo.com/v3.0/tracks/?client_id=${API_KEY}&format=json&limit=20&search=${q}&order=popularity_total`, 'search-results');
   }
 
-  async function fetchTracks(url, targetId, isPop=false) {
+  async function fetchTracks(url, targetId) {
     const el = document.getElementById(targetId);
     el.innerHTML = '<div class="loading">Загрузка...</div>';
     try {
       const res = await fetch(url);
       const data = await res.json();
-      const newTracks = data.results || [];
-      
-      // Если это не попап-лист (search), то обновляем глобальный массив
-      // Но для попап листа нам просто нужно показать и все
-      if(!isPop) tracks = newTracks;
-      
-      el.innerHTML = newTracks.map((t, i) => renderTrack(t, i, isPop)).join('');
-      updateListUI(); // Обновить иконки на кнопках
+      tracks = data.results || [];
+      el.innerHTML = tracks.map((t, i) => renderTrack(t, i)).join('');
     } catch(e) { el.innerHTML = '<div class="loading">Ошибка</div>'; }
   }
 
-  function renderTrack(t, i, isPop) {
-    const isFav = favorites.includes(t.id);    const btnId = isPop ? `pop-btn-${i}` : `list-btn-${i}`;
+  function renderTrack(t, i) {
+    const isFav = favorites.includes(t.id);
     return `
       <div class="track">
         <img src="${t.image}">
@@ -253,9 +222,7 @@
         </div>
         <div class="actions">
           <button class="btn-icon btn-fav ${isFav?'active':''}" onclick="toggleFav(${t.id}, this)">♥</button>
-          <button class="btn-icon btn-play" id="${btnId}" data-id="${t.id}" onclick="playTrackByData(${t.id})">
-            ${ICON_PLAY}
-          </button>
+          <button class="btn-icon btn-play" onclick="playTrack(${i})">▶</button>
           <button class="btn-icon" onclick="download('${t.audiodownload}', '${t.name.replace(/'/g,"")}')">⬇</button>
         </div>
       </div>`;
@@ -267,37 +234,21 @@
     localStorage.setItem('favs', JSON.stringify(favorites));
   }
 
-  // --- PLAYBACK LOGIC ---
-
-  function playTrackByData(id) {
-    // Ищем трек в списке popular или tracks
-    let track = tracks.find(t => t.id === id);
-    // Если не нашли в tracks (значит это popular), ищем там (нужно переделать логику хранения popular, но пока проще найти по ID)
-    // В текущей реализации popular треки не сохраняются глобально удобно для playNext. 
-    // Упростим: если кликнули на popular, он становится текущим треком в плеере, но next/prev будут работать только по search-list.
-    
-    if(!track) {
-       // Фолбэк для популярных (грубый)
-       track = { id: id, name: "Unknown", artist_name: "Unknown", image: "", audio: "", audiodownload: "" };
-       // В реальности нужно сохранять popular tracks в отдельную переменную, но пока оставим так.
+  // --- AUDIO LOGIC ---
+  window.playTrack = function(index) {
+    if(index >= 0 && index < tracks.length) {
+      const track = tracks[index];
+      currentIdx = index;
+      activeTrackId = track.id;
+      
+      const audio = document.getElementById('audio');
+      audio.src = track.audio;
+      audio.play().catch(e => console.error("Play error:", e));      
+      isPlaying = true;
+      updateUI(track);
+      updatePlayButtons();
     }
-    
-    playTrackObj(track);
-  }
-
-  function playTrackObj(t) {
-    const audio = document.getElementById('audio');
-    audio.src = t.audio;
-    audio.play();
-    isPlaying = true;
-    activeTrackId = t.id;
-    
-    // Найти индекс в текущем списке tracks для кнопок Next/Prev    const idx = tracks.findIndex(tr => tr.id === t.id);
-    if(idx !== -1) currentIdx = idx;
-    
-    updateUI(t);
-    updateListUI();
-  }
+  };
 
   function updateUI(t) {
     document.getElementById('miniName').textContent = t.name;
@@ -307,58 +258,45 @@
     document.getElementById('fullArt').textContent = t.artist_name;
     document.getElementById('fullImg').src = t.image;
     document.getElementById('miniPlayer').classList.add('active');
-    updatePlayButtons();
-  }
-
-  function updateListUI() {
-    // Обновляем все кнопки Play в списках
-    document.querySelectorAll('.btn-play').forEach(btn => {
-      const btnId = btn.getAttribute('data-id');
-      if(btnId == activeTrackId) {
-        btn.innerHTML = ICON_PAUSE;
-        btn.classList.add('playing');
-      } else {
-        btn.innerHTML = ICON_PLAY;
-        btn.classList.remove('playing');
-      }
-    });
   }
 
   function updatePlayButtons() {
-    const icon = isPlaying ? ICON_PAUSE : ICON_PLAY;
-    document.getElementById('miniPlayBtn').innerHTML = icon;
-    document.getElementById('fullPlayBtn').innerHTML = icon;
+    const icon = isPlaying ? '⏸' : '▶';
+    document.getElementById('miniPlayBtn').textContent = icon;
+    document.getElementById('fullPlayBtn').textContent = icon;
     
     const modal = document.getElementById('fullPlayer');
     if(isPlaying) modal.classList.add('playing');
     else modal.classList.remove('playing');
     
-    updateListUI();
+    // Update list buttons
+    document.querySelectorAll('.btn-play').forEach((btn, i) => {
+      // Simple logic: if playing, show pause on active track
+      // In a real app we'd match IDs, but here index is simpler for demo
+      btn.textContent = (i === currentIdx && isPlaying) ? '⏸' : '▶';
+    });
   }
 
   window.togglePlay = function() {
     const audio = document.getElementById('audio');
     if(!audio.src) return;
     if(audio.paused) { 
-      audio.play(); 
-      isPlaying = true;     } else { 
-      audio.pause(); 
-      isPlaying = false; 
+      audio.play(); isPlaying = true; 
+    } else { 
+      audio.pause(); isPlaying = false; 
     }
     updatePlayButtons();
   };
 
   window.playNext = function() {
-    if(currentIdx < tracks.length - 1) playTrackObj(tracks[currentIdx + 1]);
+    if(currentIdx < tracks.length - 1) playTrack(currentIdx + 1);
   };
   
-  window.playPrev = function() {
-    if(currentIdx > 0) playTrackObj(tracks[currentIdx - 1]);
+  window.playPrev = function() {    if(currentIdx > 0) playTrack(currentIdx - 1);
   };
 
   document.getElementById('audio').onended = window.playNext;
   
-  // Progress Bar
   const audio = document.getElementById('audio');
   const seekBar = document.getElementById('seekBar');
   
@@ -390,7 +328,8 @@
     a.download = name + '.mp3';
     a.target = '_blank';
     document.body.appendChild(a);
-    a.click();    document.body.removeChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 </script>
 
