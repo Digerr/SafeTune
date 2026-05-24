@@ -7,7 +7,7 @@
   <meta name="description" content="SafeTune — бесплатная музыка для стримов и видео">
   <title>SafeTune</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2 family=Syne:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     /* ── ПЕРЕМЕННЫЕ И ТЕМЫ ─────────────────────────── */
     :root {
@@ -300,7 +300,6 @@
   window.onload = () => {
     document.body.className = localStorage.getItem('theme') || '';
     fetchTracks(`https://api.jamendo.com/v3.0/tracks?client_id=${API_KEY}&format=json&limit=20&order=popularity_total`);
-    
     window.addEventListener('click', () => document.getElementById('themeMenu').classList.remove('open'));
   };
 
@@ -317,7 +316,6 @@
   async function searchGenre(genre, tabEl) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     tabEl.classList.add('active');
-    
     const url = `https://api.jamendo.com/v3.0/tracks?client_id=${API_KEY}&format=json&limit=20&order=popularity_total` + (genre ? `&fuzzytags=${genre}` : '');
     fetchTracks(url);
   }
@@ -334,15 +332,21 @@
     el.innerHTML = '<div class="loading">Ищем классные треки...</div>';
     try {
       const res = await fetch(url);
+      
+      // Если сервер вернул ошибку авторизации (например 403)
+      if (!res.ok) {
+        el.innerHTML = `<div class="loading" style="color:#ff4d6d">Ошибка сервера Jamendo: ${res.status} ${res.statusText}<br>Возможно, устарел API-ключ.</div>`;
+        return;
+      }
+
       const data = await res.json();
       
       if (data.headers && data.headers.status === "failed") {
-        el.innerHTML = `<div class="loading">Ошибка API: ${data.headers.error_message} 😔</div>`;
+        el.innerHTML = `<div class="loading" style="color:#ff4d6d">Ошибка Jamendo API:<br>${data.headers.error_message}</div>`;
         return;
       }
 
       tracks = data.results || [];
-      
       if(tracks.length === 0) {
         el.innerHTML = '<div class="loading">Ничего не найдено 😔</div>';
         return;
@@ -351,7 +355,8 @@
       el.innerHTML = tracks.map((t) => renderTrack(t)).join('');
       updatePlayButtons(); 
     } catch(e) {
-      el.innerHTML = `<div class="loading">Ошибка сети при загрузке:<br><small style="color:#ff4d6d">${e.message}</small></div>`;
+      // Ловим любые падения сети (Mixed Content, Блокировки)
+      el.innerHTML = `<div class="loading" style="color:#ff4d6d">Критическая ошибка сети:<br><small>${e.message}</small><br><br>Попробуйте обновить страницу инкогнито или проверить CORS.</div>`;
     }
   }
 
@@ -401,17 +406,4 @@
     activeTrackId = stringId;
     
     const audio = document.getElementById('audio');
-    audio.src = track.audio;
-    audio.play().catch(e => console.log("Play interrupted"));
-    
-    isPlaying = true;
-    updateUI(track);
-    updatePlayButtons();
-  };
-
-  function updateUI(t) {
-    document.getElementById('miniName').textContent = t.name;
-    document.getElementById('miniArt').textContent = t.artist_name;
-    document.getElementById('miniImg').src = t.image;
-    
-    document.getElementById('fullName').textContent 
+    audio.src = tra
