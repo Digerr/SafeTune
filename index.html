@@ -62,11 +62,18 @@
     .drawer-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 24px; }
     .drawer-tab { background: var(--surface); padding: 12px; border-radius: var(--r-sm); font-size: 13px; font-weight: 500; text-align: center; border: 1px solid rgba(255,255,255,0.03); }
     .drawer-tab.active { background: var(--accent); color: #000; font-weight: 600; }
+    
     .title-with-action { display: flex; justify-content: space-between; align-items: center; margin: 20px 0 14px; }
     .clear-history-btn { font-size: 12px; color: var(--text3); font-weight: 500; }
   </style>
 </head>
 <style>
+    /* Новые стили для селекторов звука и таймера в меню */
+    .pill-select { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin-bottom: 20px; padding-bottom: 4px; }
+    .pill-select::-webkit-scrollbar { display: none; }
+    .pill-btn { background: var(--surface); padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; color: var(--text2); border: 1px solid rgba(255,255,255,0.04); white-space: nowrap; }
+    .pill-btn.active { background: rgba(0,229,255,0.1); color: var(--accent); border-color: var(--accent); }
+
     /* ── ОСНОВНОЙ КОНТЕНТ ──────────────────────────── */
     main { max-width: 680px; margin: 0 auto; padding: 20px 14px 0; }
     .hero { text-align: center; padding: 10px 0 20px; }
@@ -93,7 +100,6 @@
     .duration { color: var(--text3); font-size: 12px; font-variant-numeric: tabular-nums; margin-right: 4px; }
     .actions { display: flex; gap: 6px; align-items: center; }
 
-    /* Кнопки действий */
     .btn-icon { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: transparent; color: var(--text2); }
     .btn-icon svg { width: 16px; height: 16px; fill: currentColor; }
     .btn-fav.active { color: #ff4d6d; }
@@ -129,7 +135,6 @@
     .close-modal svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; }
     .m-cover { width: min(70vw, 280px); aspect-ratio: 1; border-radius: 18px; margin-bottom: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); object-fit: cover; }
     
-    /* УМНАЯ ХАОТИЧНАЯ АНИМАЦИЯ ЭКВАЛАЙЗЕРА ТУТ */
     .eq-box { display: flex; gap: 5px; height: 26px; align-items: flex-end; margin-bottom: 20px; opacity: 0; transition: opacity 0.3s; }
     .modal.playing .eq-box { opacity: 1; }
     .bar { width: 4px; background: var(--accent); height: 4px; border-radius: 2px; }
@@ -143,12 +148,11 @@
     .m-title { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 700; text-align: center; margin-bottom: 4px; width: 100%; max-width: 340px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .m-artist { color: var(--text2); margin-bottom: 12px; font-size: 14px; text-align: center; }
     
-    /* Плашка инфо качества (BPM/Kbps) */
     .audio-specs { display: flex; gap: 8px; margin-bottom: 24px; }
     .spec-tag { background: var(--surface2); color: var(--text2); font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px; text-transform: uppercase; border: 1px solid rgba(255,255,255,0.03); }
     .spec-tag span { color: var(--accent); }
 
-    .modal-controls { display: flex; gap: 20px; align-items: center; margin-bottom: 28px; }
+    .modal-controls { display: flex; gap: 16px; align-items: center; margin-bottom: 28px; }
     .modal-btn { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text2); }
     .modal-btn.active { color: #ff4d6d; }
     .modal-btn svg { width: 20px; height: 20px; fill: currentColor; }
@@ -170,6 +174,7 @@
   <symbol id="icon-prev" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></symbol>
   <symbol id="icon-heart" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.5 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></symbol>
   <symbol id="icon-download" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></symbol>
+  <symbol id="icon-share" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/></symbol>
 </svg>
 
 <header>
@@ -186,6 +191,23 @@
     <div class="theme-opt-btn active" id="th-" onclick="setTheme('')">🔵 Неон</div>
     <div class="theme-opt-btn" id="th-sunset" onclick="setTheme('sunset')">🟠 Закат</div>
     <div class="theme-opt-btn" id="th-matrix" onclick="setTheme('matrix')">🟢 Матрица</div>
+  </div>
+
+  <div class="section-title">🕒 Таймер сна (выключение) <span id="timerDisplay" style="color:var(--accent); margin-left:8px; font-size:12px;"></span></div>
+  <div class="pill-select">
+    <button class="pill-btn active" id="tm-off" onclick="setSleepTimer(0, 'off')">Выкл</button>
+    <button class="pill-btn" id="tm-5" onclick="setSleepTimer(5, '5')">5 мин</button>
+    <button class="pill-btn" id="tm-15" onclick="setSleepTimer(15, '15')">15 мин</button>
+    <button class="pill-btn" id="tm-30" onclick="setSleepTimer(30, '30')">30 мин</button>
+    <button class="pill-btn" id="tm-60" onclick="setSleepTimer(60, '60')">60 мин</button>
+  </div>
+
+  <div class="section-title">🎛️ Эквалайзер звука</div>
+  <div class="pill-select">
+    <button class="pill-btn active" id="eq-normal" onclick="setEQPreset('normal')">Обычный</button>
+    <button class="pill-btn" id="eq-bass" onclick="setEQPreset('bass')">Мощный Бас 🔊</button>
+    <button class="pill-btn" id="eq-vocal" onclick="setEQPreset('vocal')">Вокал 🎤</button>
+    <button class="pill-btn" id="eq-electro" onclick="setEQPreset('electro')">Электро ⚡</button>
   </div>
 
   <div class="section-title">⚡ Навигация по жанрам</div>
@@ -251,27 +273,22 @@
     <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
   </button>
   <img id="fullImg" class="m-cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
-  
   <div class="eq-box" id="eqBox">
     <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
   </div>
-  
   <div class="m-title" id="fullName">—</div>
   <div class="m-artist" id="fullArt">—</div>
-  
   <div class="audio-specs">
     <div class="spec-tag">Поток: <span id="specStream">128 kbps</span></div>
     <div class="spec-tag">Скачать: <span id="specMax">320 kbps</span></div>
     <div class="spec-tag">Темп: <span id="specBpm">— BPM</span></div>
   </div>
-  
   <div class="modal-controls">
-    <button class="modal-btn" id="modalFavBtn" onclick="handleModalFavClick()">
-      <svg><use href="#icon-heart"></use></svg>
-    </button>
+    <button class="modal-btn" id="modalFavBtn" onclick="handleModalFavClick()"><svg><use href="#icon-heart"></use></svg></button>
     <button class="modal-btn" onclick="handlePrevBtn()"><svg><use href="#icon-prev"></use></svg></button>
     <button class="modal-btn modal-btn-lg" onclick="handleTogglePlayBtn()" id="fullPlayBtn"><svg><use href="#icon-play"></use></svg></button>
     <button class="modal-btn" onclick="handleNextBtn()"><svg><use href="#icon-next"></use></svg></button>
+    <button class="modal-btn" id="modalShareBtn" onclick="handleModalShareClick()"><svg><use href="#icon-share"></use></svg></button>
   </div>
   <div class="progress-bar">
     <span class="time" id="curTime">0:00</span>
@@ -280,7 +297,7 @@
   </div>
 </div>
 
-<audio id="audio"></audio>
+<audio id="audio" crossorigin="anonymous"></audio>
 <script>
   const API_KEY = '64794605';
   let tracks = []; let favTracksData = []; let historyTracksData = []; 
@@ -289,9 +306,12 @@
   let currentPage = 1; let currentQuery = ''; let currentGenre = '';
   let isLoadingMore = false; let hasMoreTracks = true; const LIMIT = 20;
 
+  // Переменные для Таймера и Эквалайзера
+  let sleepTimeout = null; let sleepInterval = null;
+  let audioCtx = null; let audioSource = null; let bassFilter = null; let trebleFilter = null;
+
   window.onload = () => {
-    document.body.className = localStorage.getItem('theme') || '';
-    updateThemeActiveButton(localStorage.getItem('theme') || '');
+    document.body.className = localStorage.getItem('theme') || ''; updateThemeActiveButton(localStorage.getItem('theme') || '');
     resetPagination(); loadJamendoTracks(); loadFavoritesList(); loadHistoryList();
     window.onscroll = () => {
       if ((window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 300) {
@@ -327,8 +347,7 @@
   }
 
   async function loadJamendoTracks() {
-    isLoadingMore = true; const loader = document.getElementById('scroll-loader');
-    if (currentPage > 1) loader.classList.add('visible');
+    isLoadingMore = true; const loader = document.getElementById('scroll-loader'); if (currentPage > 1) loader.classList.add('visible');
     const offset = (currentPage - 1) * LIMIT;
     let url = `https://api.jamendo.com/v3.0/tracks?client_id=${API_KEY}&format=json&limit=${LIMIT}&offset=${offset}&order=popularity_total`;
     if (currentQuery) url += `&search=${currentQuery}`; else if (currentGenre) url += `&fuzzytags=${currentGenre}`;
@@ -340,8 +359,7 @@
         if (currentPage === 1) document.getElementById('search-results').innerHTML = '<div class="loading">Ничего не найдено 😔</div>';
         loader.classList.remove('visible'); isLoadingMore = false; return;
       }
-      tracks = [...tracks, ...newTracks];
-      const container = document.getElementById('search-results');
+      tracks = [...tracks, ...newTracks]; const container = document.getElementById('search-results');
       if (currentPage === 1) container.innerHTML = newTracks.map((t) => renderTrack(t)).join('');
       else {
         const div = document.createElement('div'); div.innerHTML = newTracks.map((t) => renderTrack(t)).join('');
@@ -369,8 +387,8 @@
           <button class="btn-icon btn-play" data-id="${t.id}" onclick="playTrackById('${t.id}')">
             <svg><use href="#icon-play"></use></svg>
           </button>
-          <button class="btn-icon" onclick="download('${t.audiodownload}', '${t.name.replace(/'/g,'')}')">
-            <svg><use href="#icon-download"></use></svg>
+          <button class="btn-icon" onclick="handleShare('${t.name.replace(/'/g,'')}', '${t.artist_name.replace(/'/g,'')}', '${t.audio}')">
+            <svg><use href="#icon-share"></use></svg>
           </button>
         </div>
       </div>`;
@@ -395,7 +413,6 @@
     el.innerHTML = favTracksData.map((t) => renderTrack(t)).join('');
   }
 
-  // Лайк из модального плеера
   function handleModalFavClick() {
     let track = tracks.find(t => String(t.id) === String(activeTrackId));
     if(!track) track = favTracksData.find(t => String(t.id) === String(activeTrackId));
@@ -408,6 +425,20 @@
   function updateModalFavState() {
     const btn = document.getElementById('modalFavBtn'); if(!btn) return;
     if(favorites.includes(String(activeTrackId))) btn.classList.add('active'); else btn.classList.remove('active');
+  }
+
+  function handleModalShareClick() {
+    let track = tracks.find(t => String(t.id) === String(activeTrackId));
+    if(!track) return;
+    handleShare(track.name, track.artist_name, track.audio);
+  }
+
+  function handleShare(name, artist, url) {
+    if (navigator.share) {
+      navigator.share({ title: name, text: `Слушаю трек ${name} — ${artist} на SafeTune!`, url: url }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(url); alert('Ссылка на поток трека скопирована в буфер обмена!');
+    }
   }
 
   function addToHistory(track) {
@@ -424,30 +455,66 @@
 
   function clearHistory() { localStorage.removeItem('history_data'); loadHistoryList(); }
 
+  // ── ЛОГИКА ЭКВАЛАЙЗЕРА (WEB AUDIO API) ──
+  function initAudioNodes() {
+    if (audioCtx) return;
+    const audioNode = document.getElementById('audio');
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    audioSource = audioCtx.createMediaElementSource(audioNode);
+    
+    bassFilter = audioCtx.createBiquadFilter(); bassFilter.type = "lowshelf"; bassFilter.frequency.value = 200;
+    trebleFilter = audioCtx.createBiquadFilter(); trebleFilter.type = "highshelf"; trebleFilter.frequency.value = 2000;
+
+    audioSource.connect(bassFilter); bassFilter.connect(trebleFilter); trebleFilter.connect(audioCtx.destination);
+  }
+
+  function setEQPreset(type) {
+    initAudioNodes(); if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    document.querySelectorAll('[id^="eq-"]').forEach(b => b.classList.remove('active'));
+    document.getElementById(`eq-${type}`).classList.add('active');
+
+    if (type === 'bass') { bassFilter.gain.value = 12; trebleFilter.gain.value = -2; } 
+    else if (type === 'vocal') { bassFilter.gain.value = -4; trebleFilter.gain.value = 8; } 
+    else if (type === 'electro') { bassFilter.gain.value = 8; trebleFilter.gain.value = 6; } 
+    else { bassFilter.gain.value = 0; trebleFilter.gain.value = 0; }
+  }
+
+  // ── ЛОГИКА ТАЙМЕРА СНА ──
+  function setSleepTimer(minutes, id) {
+    clearTimeout(sleepTimeout); clearInterval(sleepInterval);
+    document.querySelectorAll('[id^="tm-"]').forEach(b => b.classList.remove('active'));
+    document.getElementById(`tm-${id}`).classList.add('active');
+    const display = document.getElementById('timerDisplay'); if(minutes === 0) { display.textContent = ""; return; }
+
+    let timeRemaining = minutes * 60;
+    sleepInterval = setInterval(() => {
+      timeRemaining--; const m = Math.floor(timeRemaining / 60); const s = timeRemaining % 60;
+      display.textContent = `(${m}:${s < 10 ? '0' : ''}${s})`; if(timeRemaining <= 0) clearInterval(sleepInterval);
+    }, 1000);
+
+    sleepTimeout = setTimeout(() => { fadeOutAndExecute(() => { isPlaying = false; updatePlayButtons(); }); display.textContent = ""; }, minutes * 60 * 1000);
+  }
+
   window.playTrackById = function(id) {
     const stringId = String(id); let track = tracks.find(t => String(t.id) === stringId);
     if(!track) track = favTracksData.find(t => String(t.id) === stringId);
-    if(!track) track = historyTracksData.find(t => String(t.id) === stringId);
-    if(!track) return;
+    if(!track) track = historyTracksData.find(t => String(t.id) === stringId); if(!track) return;
     
     if(historyTracksData.find(t => String(t.id) === stringId) && !tracks.find(t => String(t.id) === stringId)) { currentIdx = historyTracksData.indexOf(track); tracks = [...historyTracksData]; }
     else if(favTracksData.find(t => String(t.id) === stringId) && !tracks.find(t => String(t.id) === stringId)) { currentIdx = favTracksData.indexOf(track); tracks = [...favTracksData]; }
     else { currentIdx = tracks.indexOf(track); }
 
     activeTrackId = stringId; const audio = document.getElementById('audio');
+    initAudioNodes(); if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+
     clearInterval(fadeInterval); audio.volume = 1; audio.src = track.audio; audio.play().catch(() => {});
-    
     isPlaying = true; updateUI(track); updatePlayButtons(); initMediaSession(track); addToHistory(track);
   };
 
   function updateUI(t) {
     document.getElementById('miniName').textContent = t.name; document.getElementById('miniArt').textContent = t.artist_name; document.getElementById('miniImg').src = t.image;
     document.getElementById('fullName').textContent = t.name; document.getElementById('fullArt').textContent = t.artist_name; document.getElementById('fullImg').src = t.image;
-    
-    // Рассчитываем уникальный BPM на базе ID трека, чтобы он сохранялся для песни
-    const bpm = (parseInt(String(t.id).replace(/\D/g, '')) % 50) + 90 || 120;
-    document.getElementById('specBpm').textContent = `${bpm} BPM`;
-
+    const bpm = (parseInt(String(t.id).replace(/\D/g, '')) % 50) + 90 || 120; document.getElementById('specBpm').textContent = `${bpm} BPM`;
     document.getElementById('miniPlayer').classList.add('active'); updateModalFavState();
     document.querySelectorAll('.track').forEach(el => el.classList.remove('active'));
     const currentTrackEl = document.getElementById(`track-${t.id}`); if(currentTrackEl) currentTrackEl.classList.add('active');
@@ -458,12 +525,10 @@
     document.getElementById('miniPlayBtn').innerHTML = `<svg><use href="${useIcon}"></use></svg>`;
     document.getElementById('fullPlayBtn').innerHTML = `<svg><use href="${useIcon}"></use></svg>`;
     const modal = document.getElementById('fullPlayer'); if(isPlaying) modal.classList.add('playing'); else modal.classList.remove('playing');
-    
     document.querySelectorAll('.btn-play').forEach(btn => {
       const btnId = btn.getAttribute('data-id');
-      if(String(btnId) === String(activeTrackId)) {
-        btn.innerHTML = `<svg><use href="${useIcon}"></use></svg>`; if(isPlaying) btn.classList.add('playing'); else btn.classList.remove('playing');
-      } else { btn.innerHTML = `<svg><use href="#icon-play"></use></svg>`; btn.classList.remove('playing'); }
+      if(String(btnId) === String(activeTrackId)) { btn.innerHTML = `<svg><use href="${useIcon}"></use></svg>`; if(isPlaying) btn.classList.add('playing'); else btn.classList.remove('playing'); } 
+      else { btn.innerHTML = `<svg><use href="#icon-play"></use></svg>`; btn.classList.remove('playing'); }
     });
   }
 
@@ -497,7 +562,6 @@
   function formatTime(s) { if(!s || isNaN(s)) return "0:00"; const m = Math.floor(s/60); const sec = Math.floor(s%60); return m + ':' + (sec < 10 ? '0' : '') + sec; }
   window.openFullPlayer = function() { document.getElementById('fullPlayer').classList.add('open'); };
   window.closeFullPlayer = function() { document.getElementById('fullPlayer').classList.remove('open'); };
-  window.download = function(url, name) { if(!url) return; const a = document.createElement('a'); a.href = url; a.download = name + '.mp3'; a.target = '_blank'; document.body.appendChild(a); a.click(); document.body.removeChild(a); };
 </script>
 </body>
 </html>
