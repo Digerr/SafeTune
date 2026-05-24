@@ -1,335 +1,230 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SafeTune - Музыка без авторских прав</title>
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#0d0d0d">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #0d0d0d; 
-            color: #fff; 
-            min-height: 100vh;
-            padding-bottom: 150px;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .container { max-width: 600px; margin: 0 auto; padding: 16px; }
-        .header { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 24px 16px; 
-            text-align: center;
-            margin-bottom: 16px;
-            border-radius: 12px;
-        }
-        .header h1 { font-size: 26px; margin-bottom: 6px; }
-        .header p { opacity: 0.9; font-size: 14px; margin-bottom: 14px; }
-        .search-box { 
-            width: 100%; 
-            padding: 12px 16px; 
-            border: none; 
-            border-radius: 8px; 
-            font-size: 16px;
-            background: rgba(255,255,255,0.95);
-            color: #000;
-        }
-        .genres { 
-            display: flex; 
-            gap: 8px; 
-            overflow-x: auto; 
-            padding: 12px 0;
-            margin-bottom: 16px;
-            scrollbar-width: none;
-        }
-        .genres::-webkit-scrollbar { display: none; }
-        .genre-btn { 
-            flex-shrink: 0;
-            padding: 10px 18px; 
-            background: #1a1a1a;             border: 2px solid #333;
-            color: #fff; 
-            border-radius: 20px; 
-            cursor: pointer;
-            font-size: 14px;
-            white-space: nowrap;
-        }
-        .genre-btn.active { 
-            background: #667eea; 
-            border-color: #667eea;
-        }
-        .tracks-list { display: flex; flex-direction: column; gap: 12px; }
-        .track-card { 
-            background: #1a1a1a; 
-            padding: 16px; 
-            border-radius: 12px;
-            border: 1px solid #333;
-            cursor: pointer;
-            transition: transform 0.15s, background 0.15s;
-        }
-        .track-card:active { transform: scale(0.98); background: #222; }
-        .track-title { font-weight: 600; margin-bottom: 4px; font-size: 16px; }
-        .track-artist { color: #888; font-size: 14px; margin-bottom: 8px; }
-        .track-meta { display: flex; gap: 12px; font-size: 12px; color: #666; }
-        .player { 
-            position: fixed; 
-            bottom: 0; 
-            left: 0; 
-            right: 0;
-            background: #141414;
-            border-top: 2px solid #667eea;
-            padding: 14px 16px;
-            z-index: 1000;
-        }
-        .player-info { 
-            font-size: 14px; 
-            margin-bottom: 10px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            color: #ddd;
-        }
-        .player-controls { display: flex; align-items: center; gap: 14px; }
-        .play-btn { 
-            width: 52px; 
-            height: 52px; 
-            border-radius: 50%; 
-            background: #00d4ff;
-            border: none; 
-            color: #000;             font-size: 22px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            box-shadow: 0 0 12px rgba(0,212,255,0.4);
-        }
-        .progress-container { flex: 1; }
-        .progress-bar { 
-            width: 100%; 
-            height: 5px; 
-            border-radius: 3px;
-            background: #333;
-            -webkit-appearance: none;
-            appearance: none;
-            outline: none;
-        }
-        .progress-bar::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            background: #00d4ff;
-            cursor: pointer;
-            margin-top: -4px;
-        }
-        .progress-bar::-moz-range-thumb {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            background: #00d4ff;
-            cursor: pointer;
-            border: none;
-        }
-        .time { display: flex; justify-content: space-between; font-size: 11px; color: #888; margin-top: 4px; }
-        .player-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; flex-wrap: wrap; gap: 8px; }
-        .btn-small { padding: 6px 10px; background: #2a2a2a; border: 1px solid #444; color: #ccc; border-radius: 6px; font-size: 11px; cursor: pointer; }
-        .btn-small:active { background: #333; }
-        .loading { text-align: center; padding: 40px 0; color: #888; font-size: 14px; }
-        .error { text-align: center; padding: 20px; color: #ff6b6b; font-size: 14px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SafeTune</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0d0d0d">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0d0d0d;--card:#161616;--text:#fff;--accent:#00d4ff;--border:#2a2a2a;--sec:#888}
+body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);padding-bottom:160px;overflow-x:hidden}
+.header{background:linear-gradient(135deg,#667eea,#764ba2);padding:20px 16px;text-align:center;border-radius:0 0 16px 16px;margin-bottom:12px}
+.header h1{font-size:24px;margin-bottom:4px}
+.header p{opacity:.85;font-size:13px}
+.menu-btn,.close-btn{position:absolute;top:16px;right:16px;font-size:24px;cursor:pointer;z-index:10}
+.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.9);z-index:100;display:none;flex-direction:column;padding:20px;overflow-y:auto}
+.overlay.active{display:flex}
+.section-title{font-size:18px;font-weight:600;margin:16px 0 8px;border-bottom:1px solid var(--border);padding-bottom:6px}
+.palette-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.palette-btn{padding:12px;border:2px solid var(--border);border-radius:10px;background:var(--card);color:var(--text);cursor:pointer;text-align:center}
+.palette-btn.active{border-color:var(--accent);background:var(--accent);color:#000}
+.source-toggle{display:flex;gap:8px;margin-bottom:16px}
+.source-btn{flex:1;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);cursor:pointer;text-align:center}
+.source-btn.active{border-color:var(--accent);color:var(--accent)}
+.timer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.timer-btn{padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);cursor:pointer;text-align:center}
+.timer-btn.active{border-color:#ff6b6b;color:#ff6b6b}
+.genres{display:flex;gap:8px;overflow-x:auto;padding:12px 0;scrollbar-width:none}
+.genres::-webkit-scrollbar{display:none}
+.genre-btn{flex-shrink:0;padding:8px 16px;border:1px solid var(--border);border-radius:20px;background:var(--card);color:var(--text);cursor:pointer;font-size:13px;white-space:nowrap}
+.genre-btn.active{border-color:var(--accent);color:var(--accent)}
+.lists{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.list-card{background:var(--card);padding:12px;border-radius:10px;border:1px solid var(--border);cursor:pointer}
+.list-card h3{font-size:15px;margin-bottom:4px}
+.list-card p{font-size:12px;color:var(--sec)}
+.search-box{width:100%;padding:12px;border:none;border-radius:10px;background:var(--card);color:var(--text);font-size:15px;margin-bottom:12px;border:1px solid var(--border)}
+.tracks{display:flex;flex-direction:column;gap:10px}
+.track-card{background:var(--card);padding:14px;border-radius:10px;border:1px solid var(--border);cursor:pointer;transition:transform .1s}
+.track-card:active{transform:scale(.98)}
+.track-title{font-weight:600;font-size:15px;margin-bottom:4px}
+.track-artist{color:var(--sec);font-size:13px;margin-bottom:8px}
+.track-meta{display:flex;gap:12px;font-size:11px;color:var(--sec);flex-wrap:wrap}
+.load-more{width:100%;padding:12px;margin-top:12px;background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:10px;cursor:pointer;display:none}
+.player{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:2px solid var(--accent);padding:14px 16px;z-index:50}
+.player-info{font-size:14px;margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.controls{display:flex;align-items:center;gap:14px}
+.play-btn{width:48px;height:48px;border-radius:50%;background:var(--accent);border:none;color:#000;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.progress{flex:1}
+.progress input{width:100%;height:4px;background:var(--border);border-radius:2px;-webkit-appearance:none;appearance:none;outline:none}
+.progress input::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--accent);cursor:pointer}
+.time{display:flex;justify-content:space-between;font-size:11px;color:var(--sec);margin-top:4px}
+.meta-row{display:flex;justify-content:space-between;align-items:center;margin-top:10px;flex-wrap:wrap;gap:8px}
+.meta-btn{padding:6px 10px;background:var(--border);border:none;color:var(--text);border-radius:6px;font-size:11px;cursor:pointer}
+.meta-info{font-size:11px;color:var(--sec)}
+.hidden{display:none!important}
+</style>
 </head>
-<body><div class="container">
-        <div class="header">
-            <h1>🎵 SafeTune</h1>
-            <p>Музыка без авторских прав v0.7.0</p>
-            <input type="text" class="search-box" id="searchInput" placeholder="🔍 Поиск музыки или автора...">
-        </div>
+<body><div class="header">
+<h1>🎵 SafeTune</h1>
+<p>Музыка без авторских прав v0.5.5-alpha</p>
+<div class="menu-btn" onclick="document.getElementById('menu').classList.add('active')"> Меню</div>
+</div>
+<div id="menu" class="overlay">
+<div class="close-btn" onclick="document.getElementById('menu').classList.remove('active')">✕</div>
+<div class="section-title">🎨 Палитра приложения</div>
+<div class="palette-grid">
+<button class="palette-btn active" data-theme="neon" onclick="setTheme('neon')">🔵 Неон</button>
+<button class="palette-btn" data-theme="sunset" onclick="setTheme('sunset')"> Закат</button>
+<button class="palette-btn" data-theme="matrix" onclick="setTheme('matrix')">🟢 Матрица</button>
+<button class="palette-btn" data-theme="light" onclick="setTheme('light')">⚪ Светлая</button>
+</div>
+<div class="section-title">🌐 Источник музыки</div>
+<div class="source-toggle">
+<button class="source-btn active" onclick="setSource('jamendo')">Jamendo</button>
+<button class="source-btn" onclick="setSource('openverse')">Openverse</button>
+</div>
+<div class="section-title">🕒 Таймер сна</div>
+<div class="timer-grid">
+<button class="timer-btn active" onclick="setTimer(0)">Выкл</button>
+<button class="timer-btn" onclick="setTimer(5)">5 мин</button>
+<button class="timer-btn" onclick="setTimer(15)">15 мин</button>
+<button class="timer-btn" onclick="setTimer(30)">30 мин</button>
+<button class="timer-btn" onclick="setTimer(60)">60 мин</button>
+</div>
+</div><div style="padding:0 16px">
+<div class="section-title">⚡ Навигация по жанрам</div>
+<div class="genres">
+<button class="genre-btn active" onclick="loadGenre('all')">🔥 Лучшее</button>
+<button class="genre-btn" onclick="loadGenre('rock')">🎸 Рок</button>
+<button class="genre-btn" onclick="loadGenre('pop')">🎤 Поп</button>
+<button class="genre-btn" onclick="loadGenre('electronic')">🎛️ Электроника</button>
+<button class="genre-btn" onclick="loadGenre('hiphop')">🎧 Хип-хоп</button>
+<button class="genre-btn" onclick="loadGenre('ambient')">🌌 Эмбиент</button>
+</div>
+<div class="section-title">📁 Мои плейлисты</div>
+<div class="lists">
+<div class="list-card" onclick="showList('favorites')"><h3>💖 Избранное</h3><p>Треки, которые ты лайкнул</p></div>
+<div class="list-card" onclick="showList('history')"><h3>🕒 Недавно играло</h3><p id="hist-count">0 треков</p></div>
+</div>
+</div><div style="padding:0 16px">
+<input type="text" class="search-box" id="searchInput" placeholder=" Поиск музыки или автора...">
+<div id="current-genre-label" style="font-size:14px;color:var(--sec);margin-bottom:10px">🔥 Популярное сейчас</div>
+<div id="tracksContainer" class="tracks">
+<div style="text-align:center;padding:30px;color:var(--sec)">Загрузка треков...</div>
+</div>
+<button id="loadMoreBtn" class="load-more">⚡ Подгрузить ещё</button>
+</div><div class="player">
+<div class="player-info" id="playerInfo">Выберите трек для воспроизведения</div>
+<div class="controls">
+<button class="play-btn" id="playBtn">▶</button>
+<div class="progress">
+<input type="range" id="progressBar" value="0" min="0" max="100">
+<div class="time">
+<span id="currentTime">0:00</span>
+<span id="duration">0:00</span>
+</div>
+</div>
+</div>
+<div class="meta-row">
+<button class="meta-btn" id="copyAttr">📋 Атрибуция</button>
+<a id="downloadBtn" href="#" download class="meta-btn" style="text-decoration:none">⬇ Скачать 320 kbps</a>
+<span class="meta-info" id="trackMeta">Поток: 128 kbps | Темп: — BPM | Тональность: —</span>
+</div>
+</div>
+<audio id="audio" preload="metadata" crossorigin="anonymous"></audio><script>
+const API_KEY = '64794605';
+let source = 'jamendo';
+let currentGenre = 'all';
+let page = 1;
+let tracks = [];
+let favorites = JSON.parse(localStorage.getItem('st_favs') || '[]');
+let history = JSON.parse(localStorage.getItem('st_hist') || '[]');
+let sleepTimer = null;
+const audio = document.getElementById('audio');
+const playBtn = document.getElementById('playBtn');
+const progress = document.getElementById('progressBar');
+const curTime = document.getElementById('currentTime');
+const durTime = document.getElementById('duration');
+const pInfo = document.getElementById('playerInfo');
+const tMeta = document.getElementById('trackMeta');
+const dlBtn = document.getElementById('downloadBtn');
+const copyBtn = document.getElementById('copyAttr');
+const container = document.getElementById('tracksContainer');
+const loadMore = document.getElementById('loadMoreBtn');
+const searchInput = document.getElementById('searchInput');
+let isPlaying = false;
+let currentTrack = null;
 
-        <div class="genres">
-            <button class="genre-btn active" data-genre="all">🔥 Всё</button>
-            <button class="genre-btn" data-genre="rock">🎸 Рок</button>
-            <button class="genre-btn" data-genre="pop">🎤 Поп</button>
-            <button class="genre-btn" data-genre="electronic">🎛️ Электроника</button>
-            <button class="genre-btn" data-genre="hiphop">🎧 Хип-хоп</button>
-            <button class="genre-btn" data-genre="ambient">🌌 Эмбиент</button>
-        </div>
-
-        <div id="tracksContainer" class="tracks-list">
-            <div class="loading">Загрузка треков...</div>
-        </div>
-</div><div class="player" id="player">
-        <div class="player-info" id="playerInfo">Выберите трек для воспроизведения</div>
-        <div class="player-controls">
-            <button class="play-btn" id="playBtn">▶</button>
-            <div class="progress-container">
-                <input type="range" class="progress-bar" id="progressBar" value="0" min="0" max="100">
-                <div class="time">
-                    <span id="currentTime">0:00</span>
-                    <span id="duration">0:00</span>
-                </div>
-            </div>
-        </div>
-        <div class="player-meta">
-            <button class="btn-small" id="copyAttribution">📋 Атрибуция</button>
-            <span id="trackMeta">Поток: 128 kbps</span>
-        </div>
-    </div>
-
-    <audio id="audioPlayer" preload="metadata"></audio><script>
-        const JAMENDO_CLIENT_ID = '64794605'; // Твой ключ уже встроен
-        
-        const audio = document.getElementById('audioPlayer');
-        const playBtn = document.getElementById('playBtn');
-        const progressBar = document.getElementById('progressBar');
-        const currentTimeEl = document.getElementById('currentTime');
-        const durationEl = document.getElementById('duration');
-        const playerInfo = document.getElementById('playerInfo');
-        const trackMeta = document.getElementById('trackMeta');
-        const tracksContainer = document.getElementById('tracksContainer');
-        const searchInput = document.getElementById('searchInput');
-        const genreBtns = document.querySelectorAll('.genre-btn');
-        const copyBtn = document.getElementById('copyAttribution');
-        
-        let currentTrack = null;
-        let isPlaying = false;
-
-        async function loadTracks(query = '', genre = 'all') {
-            tracksContainer.innerHTML = '<div class="loading">Загрузка треков...</div>';
-            
-            try {
-                let url = `https://api.jamendo.com/v3.0/tracks/?client_id=${JAMENDO_CLIENT_ID}&format=json&limit=25&audioformat=mp32&imagesize=300`;
-                
-                if (query) {
-                    url += `&search=${encodeURIComponent(query)}`;
-                } else if (genre !== 'all') {
-                    url += `&tags=${genre}`;
-                } else {
-                    url += '&order=popularity_week';
-                }
-                
-                const response = await fetch(url);
-                if (!response.ok) throw new Error('API недоступен');
-                const data = await response.json();
-                
-                if (data.results && data.results.length > 0) {
-                    displayTracks(data.results);
-                } else {
-                    tracksContainer.innerHTML = '<div class="loading">Ничего не найдено</div>';
-                }
-            } catch (error) {
-                console.error('Ошибка:', error);
-                tracksContainer.innerHTML = '<div class="error">Ошибка загрузки. Проверь интернет или ключ.</div>';
-            }
-        }
-
-        function displayTracks(tracks) {
-            tracksContainer.innerHTML = '';
-            tracks.forEach(track => {
-                const card = document.createElement('div');
-                card.className = 'track-card';
-                card.innerHTML = `
-                    <div class="track-title">${escapeHtml(track.name)}</div>
-                    <div class="track-artist">${escapeHtml(track.artist_name)}</div>
-                    <div class="track-meta">
-                        <span>⏱️ ${formatTime(track.duration)}</span>
-                        <span>🎵 ${escapeHtml(track.album_name || 'Сингл')}</span>
-                    </div>
-                `;
-                card.addEventListener('click', () => playTrack(track));
-                tracksContainer.appendChild(card);
-            });
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }function playTrack(track) {
-            currentTrack = track;
-            // Jamendo отдаёт полные ссылки, но добавим проверку на всякий случай
-            audio.src = track.audio.startsWith('http') ? track.audio : `https:${track.audio}`;
-            
-            playerInfo.textContent = `${escapeHtml(track.name)} — ${escapeHtml(track.artist_name)}`;
-            trackMeta.textContent = `Поток: 256 kbps | BPM: ${track.bpm || '—'}`;
-            
-            audio.play().then(() => {
-                isPlaying = true;
-                playBtn.textContent = '';
-            }).catch(err => {
-                console.warn('Автоплей заблокирован:', err);
-                playBtn.textContent = '▶';
-                isPlaying = false;
-            });
-        }
-
-        playBtn.addEventListener('click', () => {
-            if (!currentTrack) {
-                alert('Сначала выбери трек из списка');
-                return;
-            }
-            if (isPlaying) {
-                audio.pause();
-                playBtn.textContent = '▶';
-            } else {
-                audio.play().catch(e => console.warn(e));
-                playBtn.textContent = '⏸';
-            }
-            isPlaying = !isPlaying;
-        });
-
-        audio.addEventListener('timeupdate', () => {
-            if (audio.duration) {
-                const progress = (audio.currentTime / audio.duration) * 100;
-                progressBar.value = progress;
-                currentTimeEl.textContent = formatTime(audio.currentTime);
-                durationEl.textContent = formatTime(audio.duration);
-            }
-        });
-
-        progressBar.addEventListener('input', (e) => {
-            if (audio.duration) {
-                audio.currentTime = (e.target.value / 100) * audio.duration;
-            }
-        });
-
-        let searchTimeout;
-        searchInput.addEventListener('input', (e) => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => loadTracks(e.target.value.trim()), 600);
-        });
-
-        genreBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                genreBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                loadTracks('', btn.dataset.genre);
-            });
-        });
-
-        copyBtn.addEventListener('click', () => {
-            if (!currentTrack) return;
-            const text = `Music: ${currentTrack.name} by ${currentTrack.artist_name}\nLicense: CC BY-NC 3.0\nSource: Jamendo.com`;
-            navigator.clipboard.writeText(text).then(() => {
-                const old = copyBtn.textContent;
-                copyBtn.textContent = '✅ Скопировано';
-                setTimeout(() => copyBtn.textContent = old, 2000);
-            }).catch(() => alert('Не удалось скопировать'));
-        });
-
-        function formatTime(sec) {
-            if (isNaN(sec)) return '0:00';
-            const m = Math.floor(sec / 60);
-            const s = Math.floor(sec % 60);
-            return `${m}:${s.toString().padStart(2, '0')}`;
-        }
-
-        // Запуск
-        loadTracks();
-
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js').catch(() => {});
-        }
-    </script>
+function setTheme(t){
+document.querySelectorAll('.palette-btn').forEach(b=>b.classList.remove('active'));
+document.querySelector(`[data-theme="${t}"]`).classList.add('active');
+const themes={neon:['#0d0d0d','#161616','#fff','#00d4ff','#2a2a2a','#888'],sunset:['#1a0f0f','#2a1a1a','#ffe6e6','#ff7b54','#3a2020','#aa8888'],matrix:['#050a05','#0a140a','#e0ffe0','#00ff41','#1a2a1a','#88aa88'],light:['#f5f5f5','#ffffff','#111','#0066cc','#e0e0e0','#666']};
+const v=themes[t];
+document.documentElement.style.setProperty('--bg',v[0]);
+document.documentElement.style.setProperty('--card',v[1]);
+document.documentElement.style.setProperty('--text',v[2]);
+document.documentElement.style.setProperty('--accent',v[3]);
+document.documentElement.style.setProperty('--border',v[4]);
+document.documentElement.style.setProperty('--sec',v[5]);
+}
+function setSource(s){
+source=s;
+document.querySelectorAll('.source-btn').forEach((b,i)=>b.classList.toggle('active',(s==='jamendo'&&i===0)||(s==='openverse'&&i===1)));
+page=1;tracks=[];container.innerHTML='<div style="text-align:center;padding:30px;color:var(--sec)">Загрузка...</div>';
+loadMore.style.display='none';
+fetchTracks();
+}
+function setTimer(m){
+document.querySelectorAll('.timer-btn').forEach(b=>b.classList.remove('active'));
+event.target.classList.add('active');
+if(sleepTimer)clearInterval(sleepTimer);
+if(m>0){
+let left=m*60;
+sleepTimer=setInterval(()=>{
+left--;
+if(left<=0){audio.pause();isPlaying=false;playBtn.textContent='▶';clearInterval(sleepTimer);alert('Таймер завершён');}
+},1000);
+}
+}async function fetchTracks(q=''){
+const offset=(page-1)*20;
+let url=source==='jamendo'?`https://api.jamendo.com/v3.0/tracks/?client_id=${API_KEY}&format=json&limit=20&audioformat=mp32&imagesize=300&order=popularity_week`:`https://api.openverse.org/v1/audio/?limit=20&page=${page}&q=${encodeURIComponent(q||'')}`;
+if(currentGenre!=='all'&&source==='jamendo')url+=`&tags=${currentGenre}`;
+if(q)url+=source==='jamendo'?`&search=${encodeURIComponent(q)}`:'';
+try{
+const res=await fetch(url);const data=await res.json();
+const newTracks=source==='jamendo'?data.results:data.results||[];
+tracks=[...tracks,...newTracks];
+renderTracks(newTracks);
+loadMore.style.display=tracks.length<100?'block':'none';
+page++;
+}catch(e){container.innerHTML='<div style="text-align:center;padding:30px;color:#ff6b6b">Ошибка загрузки. Проверь интернет.</div>'}
+}
+function renderTracks(list){
+container.innerHTML='';
+list.forEach(t=>{
+const d=document.createElement('div');d.className='track-card';
+d.innerHTML=`<div class="track-title">${esc(t.title||t.name)}</div><div class="track-artist">${esc(t.artist_name||t.creator||'Автор')}</div><div class="track-meta"><span>⏱ ${fmt(t.duration||0)}</span><span>🎵 ${esc(t.album_name||t.album?.title||'Сингл')}</span></div>`;
+d.onclick=()=>play(t);container.appendChild(d);
+});
+}
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+function fmt(s){if(!s||isNaN(s))return'0:00';const m=Math.floor(s/60);const sec=Math.floor(s%60);return`${m}:${sec.toString().padStart(2,'0')}`}
+function play(t){
+currentTrack=t;
+audio.src=source==='jamendo'?t.audio:t.url;
+pInfo.textContent=`${esc(t.title||t.name)} — ${esc(t.artist_name||t.creator||'')}`;
+tMeta.textContent=`Поток: ${source==='jamendo'?'128':'192'} kbps | Темп: ${t.bpm||'—'} BPM | Тональность: ${t.musicinfo?.keys?.camelot||'—'}`;
+dlBtn.href=source==='jamendo'?(t.audio_download||t.audio):t.url;
+audio.play().then(()=>{isPlaying=true;playBtn.textContent='⏸'}).catch(()=>{playBtn.textContent='▶'});
+addToHistory(t);
+}
+playBtn.onclick=()=>{
+if(!currentTrack)return;
+if(isPlaying){audio.pause();playBtn.textContent='▶'}else{audio.play().catch(()=>{});playBtn.textContent='⏸'}
+isPlaying=!isPlaying;
+};
+audio.ontimeupdate=()=>{if(audio.duration){progress.value=(audio.currentTime/audio.duration)*100;curTime.textContent=fmt(audio.currentTime);durTime.textContent=fmt(audio.duration)}};
+progress.oninput=e=>{if(audio.duration)audio.currentTime=(e.target.value/100)*audio.duration};
+audio.onended=()=>{isPlaying=false;playBtn.textContent='▶'};
+copyBtn.onclick=()=>{if(!currentTrack)return;const txt=`Music: ${currentTrack.title||currentTrack.name} by ${currentTrack.artist_name||currentTrack.creator||'Artist'}\nLicense: CC BY 3.0\nSource: ${source==='jamendo'?'Jamendo':'Openverse'}`;navigator.clipboard.writeText(txt).then(()=>{copyBtn.textContent='✅ Готово';setTimeout(()=>copyBtn.textContent='📋 Атрибуция',1500)})};
+function addToHistory(t){history=history.filter(h=>h.id!==t.id);history.unshift({id:t.id,title:t.title||t.name,artist:t.artist_name||t.creator||''});if(history.length>20)history.pop();localStorage.setItem('st_hist',JSON.stringify(history));document.getElementById('hist-count').textContent=`${history.length} треков`}
+function showList(type){const list=type==='favorites'?favorites:history;container.innerHTML=list.length?list.map(t=>`<div class="track-card"><div class="track-title">${esc(t.title)}</div><div class="track-artist">${esc(t.artist)}</div></div>`).join(''):'<div style="text-align:center;padding:30px;color:var(--sec)">Список пуст</div>'}
+function loadGenre(g){currentGenre=g;page=1;tracks=[];container.innerHTML='<div style="text-align:center;padding:30px;color:var(--sec)">Загрузка...</div>';loadMore.style.display='none';document.querySelectorAll('.genre-btn').forEach(b=>b.classList.toggle('active',b.textContent.toLowerCase().includes(g==='all'?'лучшее':g)));document.getElementById('current-genre-label').textContent=g==='all'?'🔥 Популярное сейчас':`🎵 Жанр: ${g}`;fetchTracks()}
+searchInput.oninput=e=>{clearTimeout(searchInput.t);searchInput.t=setTimeout(()=>{page=1;tracks=[];container.innerHTML='<div style="text-align:center;padding:30px;color:var(--sec)">Поиск...</div>';fetchTracks(e.target.value)},600)};
+loadMore.onclick=()=>fetchTracks(searchInput.value);
+fetchTracks();
+</script>
 </body>
 </html>
