@@ -333,9 +333,8 @@
     try {
       const res = await fetch(url);
       
-      // Если сервер вернул ошибку авторизации (например 403)
       if (!res.ok) {
-        el.innerHTML = `<div class="loading" style="color:#ff4d6d">Ошибка сервера Jamendo: ${res.status} ${res.statusText}<br>Возможно, устарел API-ключ.</div>`;
+        el.innerHTML = `<div class="loading" style="color:#ff4d6d">Ошибка сервера Jamendo: ${res.status} ${res.statusText}</div>`;
         return;
       }
 
@@ -355,8 +354,7 @@
       el.innerHTML = tracks.map((t) => renderTrack(t)).join('');
       updatePlayButtons(); 
     } catch(e) {
-      // Ловим любые падения сети (Mixed Content, Блокировки)
-      el.innerHTML = `<div class="loading" style="color:#ff4d6d">Критическая ошибка сети:<br><small>${e.message}</small><br><br>Попробуйте обновить страницу инкогнито или проверить CORS.</div>`;
+      el.innerHTML = `<div class="loading" style="color:#ff4d6d">Критическая ошибка сети:<br><small>${e.message}</small></div>`;
     }
   }
 
@@ -406,4 +404,113 @@
     activeTrackId = stringId;
     
     const audio = document.getElementById('audio');
-    audio.src = tra
+    audio.src = track.audio;
+    audio.play().catch(e => console.log("Play interrupted"));
+    
+    isPlaying = true;
+    updateUI(track);
+    updatePlayButtons();
+  };
+
+  function updateUI(t) {
+    document.getElementById('miniName').textContent = t.name;
+    document.getElementById('miniArt').textContent = t.artist_name;
+    document.getElementById('miniImg').src = t.image;
+    
+    document.getElementById('fullName').textContent = t.name;
+    document.getElementById('fullArt').textContent = t.artist_name;
+    document.getElementById('fullImg').src = t.image;
+    
+    document.getElementById('miniPlayer').classList.add('active');
+    
+    document.querySelectorAll('.track').forEach(el => el.classList.remove('active'));
+    const currentTrackEl = document.getElementById(`track-${t.id}`);
+    if(currentTrackEl) currentTrackEl.classList.add('active');
+  }
+
+  function updatePlayButtons() {
+    const useIcon = isPlaying ? '#icon-pause' : '#icon-play';
+    document.getElementById('miniPlayBtn').innerHTML = `<svg><use href="${useIcon}"></use></svg>`;
+    document.getElementById('fullPlayBtn').innerHTML = `<svg><use href="${useIcon}"></use></svg>`;
+    
+    const modal = document.getElementById('fullPlayer');
+    if(isPlaying) modal.classList.add('playing');
+    else modal.classList.remove('playing');
+    
+    document.querySelectorAll('.btn-play').forEach(btn => {
+      const btnId = btn.getAttribute('data-id');
+      if(String(btnId) === String(activeTrackId)) {
+        btn.innerHTML = `<svg><use href="${useIcon}"></use></svg>`;
+        if(isPlaying) btn.classList.add('playing');
+        else btn.classList.remove('playing');
+      } else {
+        btn.innerHTML = `<svg><use href="#icon-play"></use></svg>`;
+        btn.classList.remove('playing');
+      }
+    });
+  }
+
+  window.togglePlay = function() {
+    const audio = document.getElementById('audio');
+    if(!audio.src) return; 
+    if(audio.paused) { 
+      audio.play().catch(() => {}); isPlaying = true; 
+    } else { 
+      audio.pause(); isPlaying = false; 
+    }
+    updatePlayButtons();
+  };
+
+  window.playNext = function() {
+    if(currentIdx < tracks.length - 1) {
+      playTrackById(tracks[currentIdx + 1].id);
+    }
+  };
+  
+  window.playPrev = function() {
+    if(currentIdx > 0) {
+      playTrackById(tracks[currentIdx - 1].id);
+    }
+  };
+
+  const audio = document.getElementById('audio');
+  const seekBar = document.getElementById('seekBar');
+
+  audio.onended = window.playNext;
+  
+  audio.ontimeupdate = () => {
+    if(audio.duration) {
+      seekBar.value = (audio.currentTime / audio.duration) * 100;
+      document.getElementById('curTime').textContent = formatTime(audio.currentTime);
+      document.getElementById('durTime').textContent = formatTime(audio.duration);
+    }
+  };
+  
+  seekBar.oninput = () => {
+    if(audio.duration) audio.currentTime = (seekBar.value / 100) * audio.duration;
+  };
+
+  function formatTime(s) {
+    if(!s || isNaN(s)) return "0:00";
+    const m = Math.floor(s/60);
+    const sec = Math.floor(s%60);
+    return m + ':' + (sec < 10 ? '0' : '') + sec;
+  }
+
+  window.openFullPlayer = function() { document.getElementById('fullPlayer').classList.add('open'); };
+  window.closeFullPlayer = function() { document.getElementById('fullPlayer').classList.remove('open'); };
+
+  window.download = function(url, name) {
+    if(!url) return;
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name + '.mp3';
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+</script>
+
+</body>
+</html>
