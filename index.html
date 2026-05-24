@@ -36,6 +36,23 @@
       --text3:    #8e8e93;
     }
 
+    /* ── СТИЛИ ЗАСТАВКИ (SPLASH SCREEN) ───────────────── */
+    .splash-screen {
+      position: fixed; inset: 0; background: #0d0d0d; z-index: 9999;
+      display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+      padding: 60px 20px; opacity: 1; visibility: visible;
+      transition: opacity 0.4s ease, visibility 0.4s;
+    }
+    .splash-screen.fade-out { opacity: 0; visibility: hidden; }
+    .splash-center { text-align: center; margin-auto: auto; display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; }
+    .splash-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 3rem; color: #00e5ff; margin-bottom: 10px; letter-spacing: -1px; }
+    .splash-sub { font-size: 14px; color: #888; font-weight: 500; }
+    .splash-bottom { font-size: 12px; color: #444; font-family: monospace; font-weight: 600; }
+    
+    /* Индикатор пульсации на заставке */
+    .splash-pulse { width: 40px; height: 4px; background: #00e5ff; border-radius: 2px; margin-top: 24px; animation: pulse 1.2s infinite ease-in-out; }
+    @keyframes pulse { 0%, 100% { transform: scaleX(0.4); opacity: 0.3; } 50% { transform: scaleX(1.2); opacity: 1; } }
+
     /* ── СБРОС СТИЛЕЙ ──────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     body {
@@ -45,8 +62,10 @@
     }
     button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
     input  { font-family: inherit; outline: none; }
-
-    /* ── ХЭДЕР ──────────────────────────────────────── */
+  </style>
+</head>
+<style>
+    /* Хэдер */
     header {
       position: sticky; top: 0; z-index: 40; height: 60px;
       background: rgba(13,13,13,0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
@@ -56,9 +75,7 @@
     body.light header { background: rgba(245,245,247,0.85); border-bottom: 1px solid rgba(0,0,0,0.06); }
     .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; letter-spacing: -0.3px; color: var(--accent); }
     .menu-btn { background: var(--surface2); padding: 8px 16px; border-radius: 30px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
-  </style>
-</head>
-<style>
+
     /* Выезжающая шторка меню */
     .drawer {
       position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); z-index: 200; border-radius: 24px 24px 0 0; padding: 16px 20px 40px;
@@ -108,15 +125,13 @@
     .name { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
     .artist { color: var(--text2); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .duration { color: var(--text3); font-size: 12px; margin-right: 4px; }
-    .actions { display: flex; gap: 6px; align-items: center; }
+    .actions { display: flex; gap: 8px; align-items: center; }
 
-    /* ВОЗВРАТ ИДЕАЛЬНЫХ КНОПОК ИЗ ТВОЕГО ВИДЕО */
     .btn-icon { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: transparent; transition: background .15s; color: var(--text2); }
     .btn-icon:hover { background: var(--surface3); color: var(--text); }
     .btn-icon svg { width: 16px; height: 16px; fill: currentColor; }
-    
     .btn-fav.active { color: #ff4d6d; }
-    .btn-play { background: var(--accent); color: #000; width: 36px; height: 36px; box-shadow: 0 0 10px var(--accent); }
+    .btn-play { background: var(--accent); color: #000; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
     .btn-play.playing { background: var(--surface3); color: var(--accent); box-shadow: none; border: 1px solid rgba(255,255,255,0.1); }
 
     .loading { text-align: center; padding: 20px; color: var(--text3); }
@@ -132,7 +147,7 @@
     .p-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .p-art { font-size: 12px; color: var(--text2); }
     .p-controls { display: flex; align-items: center; gap: 6px; }
-    .p-btn { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text); }
+    .p-btn { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text); background: var(--surface2); }
     .p-btn svg { width: 18px; height: 18px; fill: currentColor; }
     .p-btn-play { background: var(--accent); color: #000; width: 40px; height: 40px; box-shadow: 0 0 8px var(--accent); }
 
@@ -145,9 +160,9 @@
     .m-artist { color: var(--text2); margin-bottom: 30px; font-size: 14px; text-align: center; }
     
     .modal-controls { display: flex; gap: 24px; align-items: center; margin-bottom: 30px; }
-    .modal-btn { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text2); }
+    .modal-btn { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text2); background: var(--surface2); }
     .modal-btn.active { color: #ff4d6d; }
-    .modal-btn svg { width: 22px; height: 22px; fill: currentColor; }
+    .modal-btn svg { width: 20px; height: 20px; fill: currentColor; }
     .modal-btn-lg { width: 64px; height: 64px; background: var(--accent); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px var(--accent); }
 
     .progress-bar { width: 100%; max-width: 340px; display: flex; align-items: center; gap: 12px; }
@@ -155,7 +170,6 @@
     input[type=range] { flex: 1; height: 4px; -webkit-appearance: none; background: var(--surface3); border-radius: 2px; outline: none; }
     input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; background: var(--accent); border-radius: 50%; }
 
-    /* Спецификации строго под ползунком трека */
     .audio-specs { display: flex; gap: 6px; margin-top: 36px; width: 100%; max-width: 340px; justify-content: center; }
     .spec-tag { background: var(--surface2); color: var(--text2); font-size: 10px; font-weight: 600; padding: 6px 12px; border-radius: 6px; text-transform: uppercase; }
     .spec-tag span { color: var(--accent); }
@@ -164,6 +178,15 @@
   </style>
 </head>
   <body>
+
+<div class="splash-screen" id="appSplashScreen">
+  <div class="splash-center">
+    <div class="splash-logo">SafeTune</div>
+    <div class="splash-sub">Музыка без авторских прав</div>
+    <div class="splash-pulse"></div>
+  </div>
+  <div class="splash-bottom">v1.2.0-stable</div>
+</div>
 
 <svg style="display: none;">
   <symbol id="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
@@ -308,6 +331,16 @@
     };
   };
 
+  // Функция закрытия заставки загрузки приложения
+  function hideSplashScreen() {
+    const splash = document.getElementById('appSplashScreen');
+    if (splash) {
+      splash.classList.add('fade-out');
+      // Полностью удаляем из DOM через полсекунды, чтобы не грузил память
+      setTimeout(() => splash.remove(), 500);
+    }
+  }
+
   function openDrawer() { document.getElementById('sideDrawer').classList.add('open'); }
   function closeDrawer() { document.getElementById('sideDrawer').classList.remove('open'); }
   function setTheme(t) { document.body.className = t; localStorage.setItem('theme', t); updateThemeActiveButton(t); }
@@ -355,6 +388,10 @@
       }
       updatePlayButtons();
     } catch (e) { if (currentPage === 1) document.getElementById('search-results').innerHTML = '<div class="loading">Ошибка сети</div>'; }
+    
+    // ТУТ ГАРАНТИРОВАНО ТУШИМ ЗАСТАВКУ ПОСЛЕ ПЕРВОЙ ЗАГРУЗКИ ДАННЫХ
+    hideSplashScreen();
+    
     loader.classList.remove('visible'); isLoadingMore = false;
   }
 
@@ -463,7 +500,6 @@
 
     activeTrackId = stringId; const audio = document.getElementById('audio'); 
     clearInterval(fadeInterval); audio.volume = 1; audio.src = track.audio; audio.play().catch(() => {});
-    
     isPlaying = true; updateUI(track); updatePlayButtons(); initMediaSession(track); addToHistory(track);
   };
 
@@ -493,6 +529,7 @@
     fadeInterval = setInterval(() => { if (audio.volume > 0.1) { audio.volume -= 0.15; } else { clearInterval(fadeInterval); audio.pause(); audio.volume = 1; callback(); } }, 40);
   }
 
+  // Фикс, чтобы системные кнопки на локскрине тоже глушили звук плавно
   function handleTogglePlayBtn() {
     const audio = document.getElementById('audio'); if(!audio.src) return;
     if(audio.paused) { audio.volume = 1; audio.play().catch(() => {}); isPlaying = true; updatePlayButtons(); if (navigator.mediaSession) navigator.mediaSession.playbackState = "playing"; }
