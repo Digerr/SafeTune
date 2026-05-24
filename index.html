@@ -143,7 +143,8 @@
     /* ── МОДАЛЬНЫЙ ПЛЕЕР ───────────────────────────── */
     .modal {
       position: fixed; inset: 0; background: var(--bg); z-index: 100;
-      display: none; flex-direction: column; align-items: center; padding: 20px 24px 40px;
+      display: none; /* Жёстко скрываем блок, чтобы он не перекрывал клики */
+      flex-direction: column; align-items: center; padding: 20px 24px 40px;
     }
     .modal.open { display: flex; }
     .close-modal { align-self: flex-start; width: 40px; height: 40px; border-radius: 50%; background: var(--surface2); display: flex; align-items: center; justify-content: center; color: var(--text2); margin-bottom: 20px; }
@@ -291,7 +292,6 @@
 
   window.onload = () => {
     document.body.className = localStorage.getItem('theme') || '';
-    // Поправлен эндпоинт (убран лишний слеш перед знаками вопроса)
     fetchTracks(`https://api.jamendo.com/v3.0/tracks?client_id=${API_KEY}&format=json&limit=20&order=popularity_total`);
     
     window.addEventListener('click', () => document.getElementById('themeMenu').classList.remove('open'));
@@ -329,7 +329,6 @@
       const res = await fetch(url);
       const data = await res.json();
       
-      // Если API вернул ошибку в самом JSON
       if (data.headers && data.headers.status === "failed") {
         el.innerHTML = `<div class="loading">Ошибка API: ${data.headers.error_message} 😔</div>`;
         return;
@@ -345,7 +344,6 @@
       el.innerHTML = tracks.map((t) => renderTrack(t)).join('');
       updatePlayButtons(); 
     } catch(e) {
-      // Выводим текст ошибки, чтобы сразу понять в чем затык
       el.innerHTML = `<div class="loading">Ошибка сети при загрузке:<br><small style="color:#ff4d6d">${e.message}</small></div>`;
     }
   }
@@ -410,4 +408,7 @@
     document.getElementById('miniImg').src = t.image;
     
     document.getElementById('fullName').textContent = t.name;
-    document.getElementById('fullArt').textContent = t.art
+    document.getElementById('fullArt').textContent = t.artist_name;
+    document.getElementById('fullImg').src = t.image;
+    
+    document.getElementById('miniPlayer').c
