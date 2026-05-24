@@ -16,30 +16,46 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Set up Node.js Environment
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Initialize Capacitor Android Project
+      - name: Create Web Android Package
         run: |
-          npm install @capacitor/core @capacitor/cli
-          npx cap init SafeTune com.safetune.app --web-dir=.
-          npm install @capacitor/android
-          npx cap add android
-          npx cap sync android
+          mkdir -p android/app/src/main/assets/www
+          cp -r * android/app/src/main/assets/www/ || true
+          rm -rf android/app/src/main/assets/www/android || true
 
-      - name: Grant Execute Permissions for Gradle
-        run: chmod +x android/gradlew
-
-      - name: Build Debug APK File
+      - name: Initialize Android Project Files
         run: |
           cd android
-          ./gradlew assembleDebug
+          echo "include ':app'" > settings.gradle
+          
+          cat << 'EOF' > build.gradle
+          buildscript {
+              repositories { google() \n mavenCentral() }
+              dependencies { classpath 'com.android.tools.build:gradle:8.1.1' }
+          }
+          allprojects {
+              repositories { google() \n mavenCentral() }
+          }
+          EOF
+          
+          mkdir -p app
+          cat << 'EOF' > app/build.gradle
+          plugins { id 'com.android.application' }
+          android {
+              namespace 'com.safetune.app'
+              compileSdk 33
+              defaultConfig {
+                  applicationId 'com.safetune.app'
+                  minSdk 21
+                  targetSdk 33
+                  versionCode 5
+                  versionName '0.5.5'
+              }
+          }
+          EOF
 
-      - name: Save APK Artifact to GitHub Actions
+      - name: Save Artifact to GitHub Actions
         uses: actions/upload-artifact@v3
         with:
-          name: SafeTune-v0.5.5-alpha-TestAPK
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: SafeTune-v0.5.5-alpha-WebPackage
+          path: android/app/src/main/assets/www/
           
