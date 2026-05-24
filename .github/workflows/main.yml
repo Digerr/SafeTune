@@ -16,46 +16,17 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Create Web Android Package
-        run: |
-          mkdir -p android/app/src/main/assets/www
-          cp -r * android/app/src/main/assets/www/ || true
-          rm -rf android/app/src/main/assets/www/android || true
+      - name: Set up Node.js Environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
 
-      - name: Initialize Android Project Files
-        run: |
-          cd android
-          echo "include ':app'" > settings.gradle
-          
-          cat << 'EOF' > build.gradle
-          buildscript {
-              repositories { google() \n mavenCentral() }
-              dependencies { classpath 'com.android.tools.build:gradle:8.1.1' }
-          }
-          allprojects {
-              repositories { google() \n mavenCentral() }
-          }
-          EOF
-          
-          mkdir -p app
-          cat << 'EOF' > app/build.gradle
-          plugins { id 'com.android.application' }
-          android {
-              namespace 'com.safetune.app'
-              compileSdk 33
-              defaultConfig {
-                  applicationId 'com.safetune.app'
-                  minSdk 21
-                  targetSdk 33
-                  versionCode 5
-                  versionName '0.5.5'
-              }
-          }
-          EOF
+      - name: Install Native Builder
+        run: npm install -g @capacitor/cli @capacitor/core
 
-      - name: Save Artifact to GitHub Actions
+      - name: Save Clean Code Package
         uses: actions/upload-artifact@v3
         with:
-          name: SafeTune-v0.5.5-alpha-WebPackage
-          path: android/app/src/main/assets/www/
+          name: SafeTune-v0.5.5-alpha-WebBuild
+          path: ./
           
