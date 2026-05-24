@@ -140,13 +140,21 @@
     .p-btn-play { background: var(--accent); color: #000; width: 40px; height: 40px; }
     .p-btn-play:hover { background: var(--accent); filter: brightness(1.1); }
 
-    /* ── МОДАЛЬНЫЙ ПЛЕЕР ───────────────────────────── */
+    /* ── МОДАЛЬНЫЙ ПЛЕЕР (ПОЛНЫЙ) ─────────────────── */
     .modal {
       position: fixed; inset: 0; background: var(--bg); z-index: 100;
-      display: none; /* Жёстко скрываем блок, чтобы он не перекрывал клики */
-      flex-direction: column; align-items: center; padding: 20px 24px 40px;
+      display: flex; flex-direction: column; align-items: center; padding: 20px 24px 40px;
+      /* Анимация через transform, но с блокировкой кликов в скрытом состоянии */
+      transform: translateY(100%);
+      visibility: hidden;
+      pointer-events: none;
+      transition: transform 0.4s cubic-bezier(.32,.72,0,1), visibility 0.4s;
     }
-    .modal.open { display: flex; }
+    .modal.open { 
+      transform: translateY(0); 
+      visibility: visible;
+      pointer-events: auto;
+    }
     .close-modal { align-self: flex-start; width: 40px; height: 40px; border-radius: 50%; background: var(--surface2); display: flex; align-items: center; justify-content: center; color: var(--text2); margin-bottom: 20px; }
     .close-modal:hover { background: var(--surface3); color: var(--text); }
     .close-modal svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; }
@@ -405,10 +413,4 @@
   function updateUI(t) {
     document.getElementById('miniName').textContent = t.name;
     document.getElementById('miniArt').textContent = t.artist_name;
-    document.getElementById('miniImg').src = t.image;
-    
-    document.getElementById('fullName').textContent = t.name;
-    document.getElementById('fullArt').textContent = t.artist_name;
-    document.getElementById('fullImg').src = t.image;
-    
-    document.getElementById('miniPlayer').c
+    document.getElementById('
