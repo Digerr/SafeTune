@@ -25,8 +25,6 @@
     }
     body.sunset { --accent: #ff7b00; }
     body.matrix { --accent: #00ff41; }
-    
-    /* Добавлена полноценная светлая тема */
     body.light {
       --bg:       #f5f5f7;
       --surface:  #ffffff;
@@ -43,7 +41,7 @@
     body {
       background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-size: 15px;
       padding-bottom: calc(var(--player-h) + 50px); min-height: 100dvh; overflow-x: hidden;
-      transition: background 0.3s, color 0.3s;
+      transition: background 0.2s, color 0.2s;
     }
     button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
     input  { font-family: inherit; outline: none; }
@@ -67,17 +65,17 @@
       transform: translateY(100%); visibility: hidden; transition: transform 0.4s cubic-bezier(.32,.72,0,1), visibility 0.4s;
       max-height: 85dvh; overflow-y: auto; box-shadow: 0 -10px 40px rgba(0,0,0,0.5); border-top: 1px solid rgba(255,255,255,0.05);
     }
-    body.light .drawer { box-shadow: 0 -10px 40px rgba(0,0,0,0.1); border-top: 1px solid rgba(0,0,0,0.05); }
+    body.light .drawer { box-shadow: 0 -10px 40px rgba(0,0,0,0.06); border-top: 1px solid rgba(0,0,0,0.05); }
     .drawer.open { transform: translateY(0); visibility: visible; }
     .drawer-handle { width: 40px; height: 5px; background: var(--surface3); border-radius: 3px; margin: 0 auto 20px; }
     .drawer-close { position: absolute; top: 16px; right: 16px; width: 36px; height: 36px; border-radius: 50%; background: var(--surface2); display: flex; align-items: center; justify-content: center; color: var(--text2); }
     
     .theme-grid { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
-    .theme-opt-btn { flex: 1; min-width: 75px; background: var(--surface2); padding: 10px; border-radius: var(--r-sm); text-align: center; font-size: 12px; font-weight: 600; border: 1px solid transparent; }
-    .theme-opt-btn.active { border-color: var(--accent); color: var(--accent); background: var(--surface); }
+    .theme-opt-btn { flex: 1; min-width: 75px; background: var(--surface2); padding: 10px; border-radius: var(--r-sm); text-align: center; font-size: 12px; font-weight: 600; }
+    .theme-opt-btn.active { color: var(--accent); background: var(--surface3); }
 
     .drawer-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 24px; }
-    .drawer-tab { background: var(--surface2); padding: 12px; border-radius: var(--r-sm); font-size: 13px; font-weight: 500; text-align: center; cursor: pointer; }
+    .drawer-tab { background: var(--surface2); padding: 12px; border-radius: var(--r-sm); font-size: 13px; font-weight: 500; text-align: center; }
     .drawer-tab.active { background: var(--accent); color: #000; font-weight: 600; }
     
     .pill-select { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin-bottom: 20px; padding-bottom: 4px; }
@@ -97,7 +95,7 @@
     .section-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.05rem; margin: 20px 0 14px; display: flex; align-items: center; gap: 6px; }
     .search-box { display: flex; gap: 8px; margin-bottom: 20px; }
     .search-box input { flex: 1; background: var(--surface); border: 1px solid rgba(255,255,255,0.07); padding: 13px 16px; border-radius: var(--r); color: var(--text); }
-    body.light .search-box input { border-color: rgba(0,0,0,0.1); }
+    body.light .search-box input { border-color: rgba(0,0,0,0.08); }
     .search-box button { background: var(--surface2); color: var(--text); padding: 0 18px; border-radius: var(--r); font-weight: bold; }
 
     .track-list { display: flex; flex-direction: column; gap: 6px; }
@@ -112,9 +110,13 @@
     .duration { color: var(--text3); font-size: 12px; margin-right: 4px; }
     .actions { display: flex; gap: 6px; align-items: center; }
 
-    .btn-icon { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text2); }
+    /* ФИКС КНОПОК: Убрана грубая заливка в светлой теме */
+    .btn-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text2); background: transparent; }
+    .btn-icon:hover { background: var(--surface2); color: var(--text); }
+    .btn-icon svg { width: 18px; height: 18px; fill: currentColor; }
     .btn-fav.active { color: #ff4d6d; }
-    .btn-play { background: var(--accent); color: #000; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .btn-play { background: var(--accent); color: #000; width: 36px; height: 36px; border-radius: 50%; }
+    .btn-play svg { fill: currentColor; }
 
     .loading { text-align: center; padding: 20px; color: var(--text3); }
     .scroll-loader { text-align: center; padding: 15px 0; color: var(--text3); font-size: 12px; display: none; }
@@ -122,6 +124,7 @@
 
     /* Плееры */
     .player-bar { position: fixed; bottom: 0; left: 0; right: 0; height: var(--player-h); background: var(--surface); border-top: 1px solid rgba(255,255,255,0.06); padding: 0 16px; display: none; align-items: center; gap: 12px; z-index: 50; padding-bottom: env(safe-area-inset-bottom); }
+    body.light .player-bar { border-top-color: rgba(0,0,0,0.06); }
     .player-bar.active { display: flex; }
     .p-img { width: 46px; height: 46px; border-radius: var(--r-sm); object-fit: cover; }
     .p-info { flex: 1; min-width: 0; }
@@ -129,40 +132,31 @@
     .p-art { font-size: 12px; color: var(--text2); }
     .p-controls { display: flex; align-items: center; gap: 6px; }
     .p-btn { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .p-btn svg { width: 20px; height: 20px; fill: currentColor; }
     .p-btn-play { background: var(--accent); color: #000; width: 40px; height: 40px; }
 
-    .modal { position: fixed; inset: 0; background: var(--bg); z-index: 300; display: flex; flex-direction: column; align-items: center; padding: 20px 24px 40px; transform: translateY(100%); visibility: hidden; pointer-events: none; transition: transform 0.4s cubic-bezier(.32,.72,0,1), visibility 0.4s; }
+    .modal { position: fixed; inset: 0; background: var(--bg); z-index: 300; display: flex; flex-direction: column; align-items: center; padding: 30px 24px 40px; transform: translateY(100%); visibility: hidden; pointer-events: none; transition: transform 0.4s cubic-bezier(.32,.72,0,1), visibility 0.4s; }
     .modal.open { transform: translateY(0); visibility: visible; pointer-events: auto; }
-    .close-modal { align-self: flex-start; width: 40px; height: 40px; border-radius: 50%; background: var(--surface2); display: flex; align-items: center; justify-content: center; color: var(--text2); margin-bottom: 14px; }
-    .m-cover { width: min(70vw, 260px); aspect-ratio: 1; border-radius: 18px; margin-bottom: 14px; object-fit: cover; }
+    .close-modal { align-self: flex-start; width: 40px; height: 40px; border-radius: 50%; background: var(--surface2); display: flex; align-items: center; justify-content: center; color: var(--text2); margin-bottom: 24px; }
+    .m-cover { width: min(75vw, 280px); aspect-ratio: 1; border-radius: 18px; margin-bottom: 24px; object-fit: cover; box-shadow: 0 14px 40px rgba(0,0,0,0.3); }
     
-    .eq-box { display: flex; gap: 5px; height: 26px; align-items: flex-end; margin-bottom: 14px; opacity: 0; }
-    .modal.playing .eq-box { opacity: 1; }
-    .bar { width: 4px; background: var(--accent); height: 4px; border-radius: 2px; }
-    .modal.playing .bar:nth-child(1) { animation: wave 0.45s infinite ease-in-out alternate; }
-    .modal.playing .bar:nth-child(2) { animation: wave 0.32s infinite ease-in-out alternate 0.1s; }
-    .modal.playing .bar:nth-child(3) { animation: wave 0.51s infinite ease-in-out alternate 0.2s; }
-    .modal.playing .bar:nth-child(4) { animation: wave 0.38s infinite ease-in-out alternate 0.05s; }
-    .modal.playing .bar:nth-child(5) { animation: wave 0.42s infinite ease-in-out alternate 0.15s; }
-    @keyframes wave { 0% { height: 4px; } 100% { height: 26px; } }
-
-    .m-title { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 700; text-align: center; margin-bottom: 4px; width: 100%; max-width: 340px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .m-artist { color: var(--text2); margin-bottom: 24px; font-size: 14px; text-align: center; }
+    .m-title { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 700; text-align: center; margin-bottom: 6px; width: 100%; max-width: 340px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .m-artist { color: var(--text2); margin-bottom: 30px; font-size: 14px; text-align: center; }
     
-    /* Кнопки выровнены, ничего не съезжает */
-    .modal-controls { display: flex; gap: 20px; align-items: center; margin-bottom: 24px; }
-    .modal-btn { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text2); }
+    .modal-controls { display: flex; gap: 24px; align-items: center; margin-bottom: 30px; }
+    .modal-btn { width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text2); background: transparent; }
+    .modal-btn:hover { background: var(--surface2); color: var(--text); }
     .modal-btn.active { color: #ff4d6d; }
     .modal-btn svg { width: 22px; height: 22px; fill: currentColor; }
     .modal-btn-lg { width: 64px; height: 64px; background: var(--accent); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .modal-btn-lg svg { width: 24px; height: 24px; }
 
     .progress-bar { width: 100%; max-width: 340px; display: flex; align-items: center; gap: 12px; }
     .time { font-size: 12px; color: var(--text3); min-width: 36px; }
     input[type=range] { flex: 1; height: 4px; -webkit-appearance: none; background: var(--surface3); border-radius: 2px; outline: none; }
     input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; background: var(--accent); border-radius: 50%; }
 
-    /* Плашки инфо опущены в самый низ */
-    .audio-specs { display: flex; gap: 6px; margin-top: 30px; width: 100%; max-width: 340px; justify-content: center; }
+    .audio-specs { display: flex; gap: 6px; margin-top: 36px; width: 100%; max-width: 340px; justify-content: center; }
     .spec-tag { background: var(--surface2); color: var(--text2); font-size: 10px; font-weight: 600; padding: 6px 12px; border-radius: 6px; text-transform: uppercase; }
     .spec-tag span { color: var(--accent); }
     .spec-tag.btn-download-click { cursor: pointer; font-weight: 700; background: var(--surface3); color: var(--text); }
@@ -201,17 +195,9 @@
   <div class="pill-select">
     <button class="pill-btn active" id="tm-off" onclick="setSleepTimer(0, 'off')">Выкл</button>
     <button class="pill-btn" id="tm-5" onclick="setSleepTimer(5, '5')">5 мин</button>
-    <button class="pill-btn" id="tm-15" onclick="setSleepTimer(15, '15')">15 min</button>
-    <button class="pill-btn" id="tm-30" onclick="setSleepTimer(30, '30')">30 min</button>
-    <button class="pill-btn" id="tm-60" onclick="setSleepTimer(60, '60')">60 min</button>
-  </div>
-
-  <div class="section-title">🎛️ Эквалайзер звука</div>
-  <div class="pill-select">
-    <button class="pill-btn active" id="eq-normal" onclick="setEQPreset('normal')">Обычный</button>
-    <button class="pill-btn" id="eq-bass" onclick="setEQPreset('bass')">Мощный Бас 🔊</button>
-    <button class="pill-btn" id="eq-vocal" onclick="setEQPreset('vocal')">Вокал 🎤</button>
-    <button class="pill-btn" id="eq-electro" onclick="setEQPreset('electro')">Электро ⚡</button>
+    <button class="pill-btn" id="tm-15" onclick="setSleepTimer(15, '15')">15 мин</button>
+    <button class="pill-btn" id="tm-30" onclick="setSleepTimer(30, '30')">30 мин</button>
+    <button class="pill-btn" id="tm-60" onclick="setSleepTimer(60, '60')">60 мин</button>
   </div>
 
   <div class="section-title">⚡ Навигация по жанрам</div>
@@ -278,10 +264,6 @@
   </button>
   <img id="fullImg" class="m-cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
   
-  <div class="eq-box" id="eqBox">
-    <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
-  </div>
-  
   <div class="m-title" id="fullName">—</div>
   <div class="m-artist" id="fullArt">—</div>
   
@@ -306,7 +288,7 @@
   </div>
 </div>
 
-<audio id="audio" crossorigin="anonymous"></audio>
+<audio id="audio"></audio>
 <script>
   const API_KEY = '64794605';
   let tracks = []; let favTracksData = []; let historyTracksData = []; 
@@ -314,9 +296,7 @@
   let favorites = JSON.parse(localStorage.getItem('favs') || '[]'); let fadeInterval = null;
   let currentPage = 1; let currentQuery = ''; let currentGenre = '';
   let isLoadingMore = false; let hasMoreTracks = true; const LIMIT = 20;
-
   let sleepTimeout = null; let sleepInterval = null;
-  let audioCtx = null; let audioSource = null; let bassFilter = null; let trebleFilter = null;
 
   window.onload = () => {
     document.body.className = localStorage.getItem('theme') || ''; updateThemeActiveButton(localStorage.getItem('theme') || '');
@@ -463,33 +443,6 @@
 
   function clearHistory() { localStorage.removeItem('history_data'); loadHistoryList(); }
 
-  // ЖЕЛЕЗОБЕТОННЫЙ ОБХОД БЛОКИРОВОК CORS БРАУЗЕРА ТУТ
-  function initAudioNodes() {
-    if (audioCtx) return;
-    try {
-      const audioNode = document.getElementById('audio');
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      audioSource = audioCtx.createMediaElementSource(audioNode);
-      
-      bassFilter = audioCtx.createBiquadFilter(); bassFilter.type = "lowshelf"; bassFilter.frequency.value = 200;
-      trebleFilter = audioCtx.createBiquadFilter(); trebleFilter.type = "highshelf"; trebleFilter.frequency.value = 2000;
-      
-      audioSource.connect(bassFilter); bassFilter.connect(trebleFilter); trebleFilter.connect(audioCtx.destination);
-    } catch(e) {
-      console.log("AudioContext CORS пассивный режим активен.");
-    }
-  }
-
-  function setEQPreset(type) {
-    initAudioNodes(); if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-    document.querySelectorAll('[id^="eq-"]').forEach(b => b.classList.remove('active')); document.getElementById(`eq-${type}`).classList.add('active');
-    if(!bassFilter) return; // Защита от блокировок
-    if (type === 'bass') { bassFilter.gain.value = 12; trebleFilter.gain.value = -2; } 
-    else if (type === 'vocal') { bassFilter.gain.value = -4; trebleFilter.gain.value = 8; } 
-    else if (type === 'electro') { bassFilter.gain.value = 8; trebleFilter.gain.value = 6; } 
-    else { bassFilter.gain.value = 0; trebleFilter.gain.value = 0; }
-  }
-
   function setSleepTimer(minutes, id) {
     clearTimeout(sleepTimeout); clearInterval(sleepInterval);
     document.querySelectorAll('[id^="tm-"]').forEach(b => b.classList.remove('active')); document.getElementById(`tm-${id}`).classList.add('active');
@@ -510,9 +463,7 @@
 
     activeTrackId = stringId; const audio = document.getElementById('audio'); 
     
-    // Перезапуск тега для полного сброса CORS блокировок
     clearInterval(fadeInterval); audio.volume = 1; 
-    audio.removeAttribute('src'); audio.load();
     audio.src = track.audio;
     audio.play().catch(() => {});
     
@@ -573,15 +524,9 @@
 
   async function download(url, name) {
     if(!url) return;
-    try {
-      const response = await fetch(url); const blob = await response.blob();
-      const blobUrl = window.URL.createObjectURL(blob); const a = document.createElement('a');
-      a.href = blobUrl; a.download = name.trim().replace(/[^a-zA-Z0-9а-яА-Я ]/g, "") + '.mp3';
-      document.body.appendChild(a); a.click(); document.body.removeChild(a); window.URL.revokeObjectURL(blobUrl);
-    } catch (err) {
-      const a = document.createElement('a'); a.href = url; a.target = '_blank';
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    }
+    const cleanName = name.trim().replace(/[^a-zA-Z0-9а-яА-Я ]/g, "") + '.mp3';
+    const a = document.createElement('a'); a.href = url; a.download = cleanName; a.target = '_blank';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
   }
 </script>
 </body>
