@@ -15,10 +15,9 @@
 }
 body {
     font-family: var(--font); background: var(--bg); color: var(--text);
-    margin: 0; padding: 0; padding-bottom: 20px; overflow-x: hidden;
+    margin: 0; padding: 0; padding-bottom: 80px; overflow-x: hidden;
     -webkit-tap-highlight-color: transparent;
 }
-/* Splash Screen */
 .splash {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -30,7 +29,6 @@ body {
 .loader { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Header */
 .header {
     position: sticky; top: 0; z-index: 100; background: rgba(13, 13, 13, 0.85);
     backdrop-filter: blur(12px); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;
@@ -43,21 +41,19 @@ body {
     padding: 8px 16px; border-radius: 20px; font-size: 14px; cursor: pointer;
 }
 
-/* Menu Overlay */
 .overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.9); backdrop-filter: blur(10px);
-    z-index: 200; transform: translateY(100%); transition: transform 0.3s ease;    display: flex; flex-direction: column;
+    background: rgba(0,0,0,0.95); backdrop-filter: blur(10px);
+    z-index: 200; transform: translateY(100%); transition: transform 0.3s ease;
+    display: flex; flex-direction: column;
 }
-.overlay.open { transform: translateY(0); }
-.overlay-header {
+.overlay.open { transform: translateY(0); }.overlay-header {
     padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border);
 }
 .close-btn { background: none; border: none; color: var(--text); font-size: 28px; cursor: pointer; padding: 0; }
 .overlay-content { flex: 1; overflow-y: auto; padding: 20px; }
 
-/* Sections & Buttons */
-.section-title { font-size: 14px; font-weight: 600; color: var(--text-sec); margin-bottom: 12px; margin-top: 24px; text-transform: uppercase; letter-spacing: 1px; }
+.section-title { font-size: 14px; font-weight: 600; color: var(--text-sec); margin-bottom: 12px; margin-top: 20px; text-transform: uppercase; letter-spacing: 1px; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .btn-option {
@@ -67,7 +63,6 @@ body {
 .btn-option.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; }
 .btn-option.danger.active { background: transparent; border-color: #ff4757; color: #ff4757; }
 
-/* Main Content */
 .container { padding: 20px; max-width: 600px; margin: 0 auto; }
 .search-box {
     width: 100%; padding: 14px 16px; background: var(--card); border: 1px solid var(--border);
@@ -76,7 +71,6 @@ body {
 .search-box:focus { border-color: var(--accent); }
 .genre-label { font-size: 18px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
 
-/* Tracks List */
 .tracks-list { display: flex; flex-direction: column; gap: 12px; }
 .track-item {
     display: flex; align-items: center; gap: 12px; background: var(--card); padding: 12px;
@@ -96,20 +90,35 @@ body {
 .btn-icon {
     background: none; border: none; color: var(--text-sec); font-size: 20px;
     cursor: pointer; padding: 8px; border-radius: 50%; transition: 0.2s;
-}.btn-icon:hover { color: var(--text); background: rgba(255,255,255,0.1); }
+}
+.btn-icon:hover { color: var(--text); background: rgba(255,255,255,0.1); }
 .btn-icon.liked { color: #ff4757; }
 .btn-play { color: var(--accent); }
 
-/* Load More */
 .load-more-btn {
-    width: 100%; padding: 16px; margin-top: 20px; background: var(--card);
-    border: 1px solid var(--border); color: var(--accent); border-radius: var(--radius);
+    width: 100%; padding: 16px; margin-top: 20px; background: var(--card);    border: 1px solid var(--border); color: var(--accent); border-radius: var(--radius);
     font-size: 14px; cursor: pointer; font-weight: 600;
 }
 .load-more-btn:active { transform: scale(0.98); }
 .empty-state { text-align: center; color: var(--text-sec); padding: 40px 0; }
 
-/* Player Overlay (Full Screen) */
+/* MINI PLAYER */
+.mini-player {
+    position: fixed; bottom: 0; left: 0; right: 0; height: 64px;
+    background: var(--card); border-top: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 16px; gap: 12px;
+    z-index: 150; cursor: pointer; transition: 0.3s;
+}
+.mini-player.hidden { transform: translateY(100%); opacity: 0; pointer-events: none; }
+.mini-cover { width: 44px; height: 44px; border-radius: 8px; background: var(--border); flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.mini-cover img { width: 100%; height: 100%; object-fit: cover; }
+.mini-info { flex: 1; min-width: 0; }
+.mini-title { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mini-artist { font-size: 12px; color: var(--text-sec); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mini-controls { display: flex; gap: 8px; }
+.mini-btn { background: none; border: none; color: var(--text); font-size: 22px; cursor: pointer; padding: 4px; }
+
+/* FULL PLAYER */
 .player-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: var(--bg); z-index: 300; display: flex; flex-direction: column;
@@ -137,7 +146,6 @@ body {
     margin-top: 10px; cursor: pointer; padding: 10px;
 }
 .player-like-large.liked { color: #ff4757; }
-
 .player-controls-main { display: flex; align-items: center; justify-content: center; gap: 30px; margin-bottom: 20px; }
 .ctrl-btn { background: none; border: none; color: var(--text); font-size: 24px; cursor: pointer; }
 .ctrl-play-btn {
@@ -145,7 +153,8 @@ body {
     color: #000; font-size: 28px; display: flex; align-items: center; justify-content: center;
     box-shadow: 0 0 20px var(--accent-glow);
 }
-.progress-container { width: 100%; margin-bottom: 20px; }.progress-bar { width: 100%; height: 4px; background: var(--border); border-radius: 2px; -webkit-appearance: none; outline: none; }
+.progress-container { width: 100%; margin-bottom: 20px; }
+.progress-bar { width: 100%; height: 4px; background: var(--border); border-radius: 2px; -webkit-appearance: none; outline: none; }
 .progress-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; background: var(--accent); border-radius: 50%; cursor: pointer; }
 .time-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-sec); margin-top: 6px; }
 
@@ -161,20 +170,17 @@ body {
 }
 </style>
 </head>
-<body><!-- Splash Screen -->
-<div class="splash" id="splash">
+<body><div class="splash" id="splash">
     <div class="splash-logo">SafeTune</div>
     <div class="splash-sub">Музыка без авторских прав</div>
     <div class="loader"></div>
 </div>
 
-<!-- Header -->
 <div class="header">
     <div class="logo">Safe<span>Tune</span></div>
     <button class="menu-btn" onclick="toggleMenu(true)">☰ Меню</button>
 </div>
 
-<!-- Menu Overlay -->
 <div class="overlay" id="menuOverlay">
     <div class="overlay-header">
         <div class="logo">Меню</div>
@@ -183,16 +189,10 @@ body {
     <div class="overlay-content">
         <div class="section-title">🎨 Тема</div>
         <div class="grid-2">
-            <button class="btn-option active" onclick="setTheme('neon', this)"> Неон</button>
+            <button class="btn-option active" onclick="setTheme('neon', this)">🔵 Неон</button>
             <button class="btn-option" onclick="setTheme('sunset', this)">🟠 Закат</button>
             <button class="btn-option" onclick="setTheme('matrix', this)">🟢 Матрица</button>
             <button class="btn-option" onclick="setTheme('light', this)">⚪ Светлая</button>
-        </div>
-
-        <div class="section-title">🌐 Источник</div>
-        <div class="grid-2">
-            <button class="btn-option active" onclick="setSource('jamendo', this)">Jamendo</button>
-            <button class="btn-option" onclick="setSource('openverse', this)">Openverse</button>
         </div>
 
         <div class="section-title">🕒 Таймер сна</div>
@@ -203,28 +203,48 @@ body {
             <button class="btn-option" onclick="setTimer(60, this)">60 мин</button>
         </div>
 
-        <div class="section-title">📁 Плейлисты</div>
+        <div class="section-title">⚡ Жанры</div>
+        <div class="grid-2">
+            <button class="btn-option active" onclick="loadGenre('all', this)">🔥 Лучшее</button>
+            <button class="btn-option" onclick="loadGenre('rock', this)">🎸 Рок</button>
+            <button class="btn-option" onclick="loadGenre('pop', this)"> Поп</button>
+            <button class="btn-option" onclick="loadGenre('electronic', this)">🎛️ Электроника</button>
+            <button class="btn-option" onclick="loadGenre('hiphop', this)">🎧 Хип-хоп</button>
+            <button class="btn-option" onclick="loadGenre('ambient', this)"> Эмбиент</button>
+        </div>
+
+        <div class="section-title"> Плейлисты</div>
         <button class="btn-option" onclick="alert('Функция в разработке')" style="width:100%; margin-bottom:10px;">➕ Создать плейлист</button>
         <button class="btn-option" onclick="showPlaylist('favorites')" style="width:100%; margin-bottom:10px; text-align:left; display:flex; align-items:center; gap:10px;">
             ❤️ Избранное <span id="favCountMenu" style="margin-left:auto; opacity:0.5">0</span>
         </button>
         <button class="btn-option" onclick="showPlaylist('history')" style="width:100%; text-align:left; display:flex; align-items:center; gap:10px;">
-            🕒 История <span id="histCountMenu" style="margin-left:auto; opacity:0.5">0</span>
+             История <span id="histCountMenu" style="margin-left:auto; opacity:0.5">0</span>
         </button>
     </div>
-</div><!-- Main Content -->
-<div class="container">
-    <input type="text" class="search-box" id="searchInput" placeholder=" Поиск музыки...">
-    <div class="genre-label" id="genreLabel"> Популярное</div>
+</div><div class="container">
+    <input type="text" class="search-box" id="searchInput" placeholder="🔍 Поиск музыки...">
+    <div class="genre-label" id="genreLabel">🔥 Популярное</div>
     <div class="tracks-list" id="tracksList"></div>
     <button class="load-more-btn" id="loadMoreBtn" onclick="loadMore()">⚡ Подгрузить ещё</button>
 </div>
 
-<!-- Player Overlay -->
+<div class="mini-player hidden" id="miniPlayer" onclick="openFullPlayer()">
+    <div class="mini-cover" id="miniCover"></div>
+    <div class="mini-info">
+        <div class="mini-title" id="miniTitle">Нет трека</div>
+        <div class="mini-artist" id="miniArtist">—</div>
+    </div>
+    <div class="mini-controls">
+        <button class="mini-btn" id="miniPlayBtn" onclick="togglePlay(event)">▶</button>
+        <button class="mini-btn" onclick="playNext(event)">⏭</button>
+    </div>
+</div>
+
 <div class="player-overlay" id="playerOverlay">
     <div class="player-top">
         <div class="player-handle"></div>
-        <button class="player-close" onclick="closePlayer()">✕</button>
+        <button class="player-close" onclick="minimizePlayer()">✕</button>
     </div>
     
     <div class="player-art-container">
@@ -272,16 +292,13 @@ body {
     </div>
 
     <div class="player-actions">
-        <button class="action-btn" onclick="copyAttribution()">📋 Атрибуция</button>
-        <button class="action-btn" onclick="shareTrack()">🔗 Поделиться</button>
+        <button class="action-btn" onclick="copyAttribution()"> Атрибуция</button>
+        <button class="action-btn" onclick="shareTrack()"> Поделиться</button>
     </div>
 </div>
 
-<!-- Audio Element -->
 <audio id="audioPlayer" preload="auto"></audio><script>
-// --- Config ---
 const CLIENT_ID = '64794605';
-let source = 'jamendo';
 let currentGenre = 'all';
 let page = 1;
 let allTracks = [];
@@ -294,23 +311,21 @@ let favorites = JSON.parse(localStorage.getItem('safetune_favs') || '[]');
 let history = JSON.parse(localStorage.getItem('safetune_hist') || '[]');
 let sleepTimer = null;
 
-// --- Elements ---
 const audio = document.getElementById('audioPlayer');
 const splash = document.getElementById('splash');
 const tracksList = document.getElementById('tracksList');
 const loadMoreBtn = document.getElementById('loadMoreBtn');
 const searchInput = document.getElementById('searchInput');
 const playerOverlay = document.getElementById('playerOverlay');
+const miniPlayer = document.getElementById('miniPlayer');
 const playerLikeBtn = document.getElementById('playerLikeBtn');
 
-// --- Init ---
 window.addEventListener('load', () => {
     fetchTracks();
     updateCounts();
     setTimeout(() => splash.classList.add('hidden'), 800);
 });
 
-// --- Themes ---
 function setTheme(name, btn) {
     const themes = {
         neon: { bg: '#0d0d0d', card: '#1a1a1a', accent: '#00d4ff', text: '#fff' },
@@ -324,15 +339,6 @@ function setTheme(name, btn) {
     document.documentElement.style.setProperty('--accent', t.accent);
     document.documentElement.style.setProperty('--text', t.text);
     updateButtons(btn);
-}
-
-function setSource(src, btn) {
-    source = src;
-    page = 1;
-    allTracks = [];
-    tracksList.innerHTML = '';
-    updateButtons(btn);
-    fetchTracks();
 }
 
 function setTimer(mins, btn) {
@@ -355,50 +361,58 @@ function updateButtons(activeBtn, isDanger = false) {
 
 function toggleMenu(open) {
     document.getElementById('menuOverlay').classList.toggle('open', open);
-}// --- Player Controls ---
-function openPlayer(track) {
+}function openPlayer(track) {
     currentTrack = track;
     playQueue = allTracks; 
     queueIndex = playQueue.findIndex(t => t.id === track.id);
     
-    // Update UI
-    document.getElementById('playerTitle').textContent = track.title || track.name;
-    document.getElementById('playerArtist').textContent = track.artist_name || track.creator;
-    
-    const img = document.getElementById('playerArt');
-    const placeholder = document.getElementById('playerPlaceholder');
-    const coverUrl = track.image || track.album_image;
-    
-    if (coverUrl && coverUrl !== 'null' && coverUrl !== '') {
-        img.src = coverUrl;
-        img.style.display = 'block';
-        placeholder.style.display = 'none';
-    } else {
-        img.style.display = 'none';
-        placeholder.style.display = 'block';
-    }
-
-    // Meta
-    document.getElementById('metaBitrate').textContent = source === 'jamendo' ? '128 kbps' : '192 kbps';
-    document.getElementById('metaBPM').textContent = track.bpm || '—';
-    document.getElementById('metaKey').textContent = track.musicinfo?.keys?.camelot || '—';
-
-    // Like Status
-    updatePlayerLikeUI();
-
-    // Play Audio
-    audio.src = source === 'jamendo' ? track.audio : track.url;
+    updatePlayerUI(track);
+    audio.src = track.audio;
     audio.play().then(() => togglePlayUI(true)).catch(() => {});
     
-    playerOverlay.classList.add('open');
+    miniPlayer.classList.remove('hidden');
     addToHistory(track);
 }
 
-function closePlayer() {
-    playerOverlay.classList.remove('open');
+function updatePlayerUI(track) {
+    const title = track.title || track.name;
+    const artist = track.artist_name || track.creator;
+    
+    document.getElementById('playerTitle').textContent = title;
+    document.getElementById('playerArtist').textContent = artist;
+    document.getElementById('miniTitle').textContent = title;
+    document.getElementById('miniArtist').textContent = artist;
+    
+    const coverUrl = track.image || track.album_image;
+    const img = document.getElementById('playerArt');
+    const placeholder = document.getElementById('playerPlaceholder');
+    const miniCover = document.getElementById('miniCover');
+    
+    if (coverUrl && coverUrl !== 'null' && coverUrl !== '') {
+        img.src = coverUrl; img.style.display = 'block'; placeholder.style.display = 'none';
+        miniCover.innerHTML = `<img src="${coverUrl}">`;
+    } else {
+        img.style.display = 'none'; placeholder.style.display = 'block';
+        miniCover.innerHTML = '';
+    }
+
+    document.getElementById('metaBitrate').textContent = '128 kbps';
+    document.getElementById('metaBPM').textContent = track.bpm || '—';
+    document.getElementById('metaKey').textContent = track.musicinfo?.keys?.camelot || '—';
+    
+    updatePlayerLikeUI();
 }
 
+function openFullPlayer() {
+    if (!currentTrack) return;
+    playerOverlay.classList.add('open');
+}
+
+function minimizePlayer() {
+    playerOverlay.classList.remove('open');
+}
 function togglePlay() {
+    if (!currentTrack) return;
     if (audio.paused) {
         audio.play();
         togglePlayUI(true);
@@ -410,7 +424,9 @@ function togglePlay() {
 
 function togglePlayUI(playing) {
     isPlaying = playing;
-    document.getElementById('playBtn').textContent = playing ? '⏸' : '▶';
+    const icon = playing ? '' : '▶';
+    document.getElementById('playBtn').textContent = icon;
+    document.getElementById('miniPlayBtn').textContent = icon;
 }
 
 function playNext() {
@@ -427,7 +443,6 @@ function playPrev() {
     }
 }
 
-// --- Audio Events ---
 audio.addEventListener('timeupdate', () => {
     if (audio.duration) {
         const pct = (audio.currentTime / audio.duration) * 100;
@@ -444,14 +459,11 @@ document.getElementById('progressBar').addEventListener('input', (e) => {
 
 audio.addEventListener('ended', playNext);
 
-// --- Helpers ---
-function formatTime(sec) {
-    if (!sec) return '0:00';
+function formatTime(sec) {    if (!sec) return '0:00';
     const m = Math.floor(sec / 60);
     const s = Math.floor(sec % 60);
     return `${m}:${s.toString().padStart(2, '0')}`;
-}// --- Fetching Logic ---
-async function fetchTracks(isLoadMore = false) {
+                         }async function fetchTracks(isLoadMore = false) {
     if (!isLoadMore) {
         tracksList.innerHTML = '<div class="empty-state"><div class="loader" style="margin:0 auto"></div></div>';
     } else {
@@ -459,36 +471,26 @@ async function fetchTracks(isLoadMore = false) {
         loadMoreBtn.disabled = true;
     }
 
-    let url = '';
-    if (source === 'jamendo') {
-        url = `https://api.jamendo.com/v3.0/tracks/?client_id=${CLIENT_ID}&format=json&limit=20&audioformat=mp32&imagesize=300&order=popularity_week`;
-        if (currentGenre !== 'all') url += `&tags=${currentGenre}`;
-        if (searchQuery) url += `&search=${encodeURIComponent(searchQuery)}`;
-    } else {
-        url = `https://api.openverse.org/v1/audio/?limit=20&page=${page}&q=${encodeURIComponent(searchQuery || '')}`;
-    }
+    let url = `https://api.jamendo.com/v3.0/tracks/?client_id=${CLIENT_ID}&format=json&limit=20&audioformat=mp32&imagesize=300&order=popularity_week`;
+    if (currentGenre !== 'all') url += `&tags=${currentGenre}`;
+    if (searchQuery) url += `&search=${encodeURIComponent(searchQuery)}`;
 
     try {
         const res = await fetch(url);
         const data = await res.json();
-        const results = source === 'jamendo' ? data.results : data.results;
+        const results = data.results || [];
 
         if (!isLoadMore) {
-            allTracks = results || [];
+            allTracks = results;
             tracksList.innerHTML = '';
         } else {
-            allTracks = [...allTracks, ...(results || [])];
+            allTracks = [...allTracks, ...results];
         }
 
-        renderTracks(results || [], isLoadMore);
-        
-        loadMoreBtn.textContent = '⚡ Подгрузить ещё';
+        renderTracks(results, isLoadMore);
+        loadMoreBtn.textContent = ' Подгрузить ещё';
         loadMoreBtn.disabled = false;
-        if (!results || results.length === 0) {
-            loadMoreBtn.style.display = 'none';
-        } else {
-            loadMoreBtn.style.display = 'block';
-        }
+        loadMoreBtn.style.display = results.length > 0 ? 'block' : 'none';
         page++;
     } catch (err) {
         console.error(err);
@@ -498,87 +500,59 @@ async function fetchTracks(isLoadMore = false) {
 }
 
 function renderTracks(newTracks, append = false) {
-    const container = tracksList;
-        newTracks.forEach(track => {
+    newTracks.forEach(track => {
         const div = document.createElement('div');
         div.className = 'track-item';
-
         const coverHtml = track.image || track.album_image 
-            ? `<img src="${track.image || track.album_image}" onerror="this.style.display='none';this.parentElement.textContent=''">` 
+            ? `<img src="${track.image || track.album_image}" onerror="this.style.display='none';this.parentElement.textContent='🎵'">` 
             : '';
-
         const isLiked = favorites.some(f => f.id === track.id);
 
         div.innerHTML = `
             <div class="track-cover">${coverHtml}</div>
             <div class="track-info">
                 <div class="track-name">${track.title || track.name}</div>
-                <div class="track-artist">${track.artist_name || track.creator}</div>
-            </div>
+                <div class="track-artist">${track.artist_name || track.creator}</div>            </div>
             <div class="track-actions">
-                <button class="btn-icon btn-like ${isLiked ? 'liked' : ''}">
-                    ${isLiked ? '❤️' : '🤍'}
-                </button>
+                <button class="btn-icon btn-like ${isLiked ? 'liked' : ''}">${isLiked ? '❤️' : '🤍'}</button>
                 <button class="btn-icon btn-play">▶</button>
             </div>
         `;
 
-        // 🟢 Кнопка PLAY работает отдельно
-        const playBtn = div.querySelector('.btn-play');
-        playBtn.onclick = (e) => {
-            e.stopPropagation(); 
-            openPlayer(track);
-        };
-
-        // 🟢 Кнопка LIKE работает отдельно
-        const likeBtn = div.querySelector('.btn-like');
-        likeBtn.onclick = (e) => {
-            e.stopPropagation();
-            toggleLike(e, track.id);
-        };
-
-        // Клик по карточке открывает плеер
-        div.onclick = (e) => {
-            openPlayer(track);
-        };
-
-        container.appendChild(div);
+        div.querySelector('.btn-play').onclick = (e) => { e.stopPropagation(); openPlayer(track); };
+        div.querySelector('.btn-like').onclick = (e) => { e.stopPropagation(); toggleLike(e, track.id); };
+        div.onclick = () => openPlayer(track);
+        tracksList.appendChild(div);
     });
 }
 
-function loadMore() {
-    fetchTracks(true);
+function loadMore() { fetchTracks(true); }
+function loadGenre(g, btn) {
+    currentGenre = g;
+    updateButtons(btn);
+    document.getElementById('genreLabel').textContent = g === 'all' ? '🔥 Популярное' : `🎵 ${g}`;
+    page = 1; tracksList.innerHTML = '';
+    fetchTracks();
 }
-// --- Search ---
+
 let searchTimeout;
 searchInput.addEventListener('input', (e) => {
     clearTimeout(searchTimeout);
     searchTimeout = setTimeout(() => {
         searchQuery = e.target.value;
-        page = 1;
-        fetchTracks();
+        page = 1; fetchTracks();
     }, 500);
 });
 
-// --- Likes ---
 function toggleLike(e, id) {
     const btn = e.target;
     const track = allTracks.find(t => t.id === id);
     if (!track) return;
-
     const index = favorites.findIndex(f => f.id === id);
-    if (index === -1) {
-        favorites.push(track);
-        btn.textContent = '❤️';
-        btn.classList.add('liked');
-    } else {
-        favorites.splice(index, 1);
-        btn.textContent = '🤍';
-        btn.classList.remove('liked');
-    }
+    if (index === -1) { favorites.push(track); btn.textContent = '❤️'; btn.classList.add('liked'); }
+    else { favorites.splice(index, 1); btn.textContent = '🤍'; btn.classList.remove('liked'); }
     localStorage.setItem('safetune_favs', JSON.stringify(favorites));
-    updateCounts();
-    updatePlayerLikeUI();
+    updateCounts(); updatePlayerLikeUI();
 }
 
 function updatePlayerLikeUI() {
@@ -587,7 +561,6 @@ function updatePlayerLikeUI() {
     playerLikeBtn.textContent = isLiked ? '❤️' : '🤍';
     playerLikeBtn.classList.toggle('liked', isLiked);
 }
-
 function togglePlayerLike() {
     if (!currentTrack) return;
     toggleLike({ target: playerLikeBtn, stopPropagation: () => {} }, currentTrack.id);
@@ -597,6 +570,7 @@ function updateCounts() {
     document.getElementById('favCountMenu').textContent = favorites.length;
     document.getElementById('histCountMenu').textContent = history.length;
 }
+
 function addToHistory(track) {
     history = history.filter(t => t.id !== track.id);
     history.unshift(track);
@@ -611,50 +585,32 @@ function showPlaylist(type) {
     tracksList.innerHTML = '';
     document.getElementById('genreLabel').textContent = type === 'favorites' ? '❤️ Избранное' : ' История';
     loadMoreBtn.style.display = 'none';
-    
-    if (list.length === 0) {
-        tracksList.innerHTML = '<div class="empty-state">Список пуст</div>';
-    } else {
-        renderTracks(list);
-    }
+    if (list.length === 0) tracksList.innerHTML = '<div class="empty-state">Список пуст</div>';
+    else renderTracks(list);
 }
 
-// --- Actions ---
 function downloadTrack() {
     if (!currentTrack) return;
-    const url = source === 'jamendo' ? (currentTrack.audio_download || currentTrack.audio) : currentTrack.url;
     const a = document.createElement('a');
-    a.href = url;
-    a.download = `${currentTrack.title || 'track'}.mp3`;
-    a.target = '_blank';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    a.href = currentTrack.audio_download || currentTrack.audio;
+    a.download = `${currentTrack.title || 'track'}.mp3`; a.target = '_blank';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
 }
 
 function copyAttribution() {
     if (!currentTrack) return;
-    const text = `Music: ${currentTrack.title || currentTrack.name} by ${currentTrack.artist_name || currentTrack.creator}\nLicense: CC BY\nSource: SafeTune`;
+    const text = `Music: ${currentTrack.title || currentTrack.name} by ${currentTrack.artist_name || currentTrack.creator}\nLicense: CC BY\nSource: Jamendo`;
     navigator.clipboard.writeText(text).then(() => alert('Скопировано!'));
 }
 
 function shareTrack() {
     if (navigator.share && currentTrack) {
-        navigator.share({
-            title: currentTrack.title || currentTrack.name,
-            text: `Послушай этот трек на SafeTune!`,
-            url: window.location.href
-        });
-    } else {
-        alert('Поделиться не удалось');    }
+        navigator.share({ title: currentTrack.title || currentTrack.name, text: `Послушай на SafeTune!`, url: location.href });
+    } else { alert('Поделиться не удалось'); }
 }
 
-// --- Service Worker ---
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').then(() => {
-        console.log('SW Registered');
-    }).catch(err => console.log('SW Error:', err));
-}
+    navigator.serviceWorker.register('/sw.js').catch(() => {});}
 </script>
 </body>
 </html>
