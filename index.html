@@ -7,7 +7,7 @@
   <meta name="description" content="SafeTune — бесплатная музыка для стримов и видео">
   <title>SafeTune</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2 family=Syne:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     /* ── ПЕРЕМЕННЫЕ И ТЕМЫ ─────────────────────────── */
     :root {
@@ -144,7 +144,6 @@
     .modal {
       position: fixed; inset: 0; background: var(--bg); z-index: 100;
       display: flex; flex-direction: column; align-items: center; padding: 20px 24px 40px;
-      /* Анимация через transform, но с блокировкой кликов в скрытом состоянии */
       transform: translateY(100%);
       visibility: hidden;
       pointer-events: none;
@@ -413,4 +412,6 @@
   function updateUI(t) {
     document.getElementById('miniName').textContent = t.name;
     document.getElementById('miniArt').textContent = t.artist_name;
-    document.getElementById('
+    document.getElementById('miniImg').src = t.image;
+    
+    document.getElementById('fullName').textContent 
