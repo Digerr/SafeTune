@@ -1,17 +1,24 @@
 {
-  "name": "SafeTune",
+  "name": "SafeTune — Музыка без авторских прав",
   "short_name": "SafeTune",
-  "description": "Free music for creators",
-  "start_url": "/",
+  "description": "Бесплатная музыка для стримов, видео и контента без авторских прав",
+  "start_url": "/index.html",
   "display": "standalone",
-  "background_color": "#0a0a0a",
-  "theme_color": "#0a0a0a",
+  "orientation": "portrait",
+  "background_color": "#0d0d0d",
+  "theme_color": "#0d0d0d",
   "icons": [
     {
       "src": "https://cdn-icons-png.flaticon.com/512/2722/2722617.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2722/2722617.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
