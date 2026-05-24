@@ -1,8 +1,8 @@
 {
-  "name": "SafeTune — Музыка без авторских прав",
+  "name": "SafeTune",
   "short_name": "SafeTune",
-  "description": "Бесплатная музыка для стримов, видео и контента без авторских прав",
-  "start_url": "/index.html",
+  "description": "Free music for creators",
+  "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0d0d0d",
