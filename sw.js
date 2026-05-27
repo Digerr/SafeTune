@@ -4,6 +4,7 @@ const STATIC_ASSETS = [
     '/manifest.json',
     '/icon-192.png',
     '/icon-512.png'
+    // Рекомендую добавить сюда '/index.html' и '/offline.html'
 ];
 
 // Установка сервис-воркера и кэширование локальной статики
@@ -46,7 +47,19 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
         caches.match(requestToMatch).then((cached) => {
             if (cached) return cached;
-            return fetch(requestToMatch);
+            
+            // Если в кэше нет, идем в сеть
+            return fetch(requestToMatch).catch(() => {
+                // Если сети нет, можно вернуть заглушку (если добавишь offline.html в кэш)
+                // return caches.match('/offline.html');
+                
+                // Пока просто возвращаем стандартную ошибку отсутствия сети
+                return new Response('Нет интернета и файл не найден в кэше', {
+                    status: 503,
+                    statusText: 'Service Unavailable'
+                });
+            });
         })
     );
 });
+// Лишняя скобка удалена!
